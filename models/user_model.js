@@ -3,14 +3,14 @@ const mongoose=require('mongoose')// to import the modules
 const userSchema=new mongoose.Schema({
     fullName:{
         type:String,
-        reuired:true
+        required:true
     },
     email:{
         type:String,
-        reuired:true
+        required:true
     },
     password:{
         type:String,
-        reuired:true
+        required:true
     }
 })

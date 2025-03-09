@@ -6,6 +6,8 @@ const PORT=3000;
 const {MONGODB_URI}=require('./config');
 require('./models/user_model'); //not exported right now
 //use middleware
+
+app.use(express.json());//will convert everything that comes from middleware into json
 app.use(require('./routes/authentication'));
 
 mongoose.connect(MONGODB_URI);
