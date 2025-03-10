@@ -6,9 +6,22 @@ const UserModel=mongoose.model("UserModel");
 
 const bcrypt=require('bcryptjs');
 
+const jwt=require('jsonwebtoken');
+const {JWT_SECRET}=require('../config');
+
+const protectedRoute=require('../middleware/protectedResource');
+const protectedResource = require('../middleware/protectedResource');
+
+
 router.get('/',(req,res)=>{
     res.send("Hello from sashwat");
 });
+
+router.get('/secured',protectedResource,(req,res)=>{
+    res.send("Welcome to secured area");
+});
+
+
 router.post('/login',(req,res)=>{
     const {email,password}=req.body;//destructuring
     if(!email || !password){
@@ -22,7 +35,10 @@ router.post('/login',(req,res)=>{
         bcrypt.compare(password,dbUser.password)
         .then((didMatch)=>{
             if(didMatch){
-                return res.status(200).json({result:"successful Log IN"});//check what happens if i remove return here
+                //return res.status(200).json({result:"successful Log IN"});//check what happens if i remove return here
+                //create send a token
+                const jwtToken=jwt.sign({_id:dbUser._id},JWT_SECRET);
+                res.json({token:jwtToken});
             }
             else{
                 return res.status(400).json({error:"Invalid Credentials"});//i dont want to continue furthur after encountering this error
