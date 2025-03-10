@@ -17,11 +17,11 @@ module.exports=(req,res,next)=>{
             return res.status(401).json({error:"User not logged in"});//i dont want to continue furthur after encountering this error
         }
         const {_id}=payload;
-        UserModel.find(_id)
+        UserModel.findById(_id)// why do we use findByid over findid
         .then(dbUser=>{
             req.dbUser=dbUser;
+            next();//waiting required only when user found then go next
         });
         //forward the request to the next middleware or next route
-        next();
     })
 }
