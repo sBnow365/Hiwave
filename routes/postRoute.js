@@ -13,6 +13,15 @@ router.post('/createpost',protectedResource,(req,res)=>{
     }
      //console.log(req.dbUser);
       //res.send("Done");
+      req.dbUser.password=undefined
     const post=new PostModel({title:title,body:body,author:req.dbUser})//make post object
+
+    post.save()
+    .then((dbPost)=>{
+        res.status(201).json({post:dbPost})
+    })
+    .catch((error)=>{
+        console.log(error);
+    });
 });
 module.exports=router;
