@@ -5,7 +5,30 @@ const mongoose=require('mongoose');
 const protectedResource = require('../middleware/protectedResource');
 const PostModel=mongoose.model("PostModel");
 
+router.get('/posts',(req,res)=>{
+    PostModel.find()
+    .populate("author","_id fullName")
+    .then((dbPosts)=>{
+        res.status(200).json({posts:dbPosts})
+    })
+    .catch((error)=>{
+        console.log('yo');
+        console.log(error);
+    });
+});
 
+//whatever we pass to protected route as db user will be forwarded to this endpoint
+router.get('/myposts',protectedResource,(req,res)=>{
+    PostModel.find({author : req.dbUser._id })
+    .populate("author","_id fullName")
+    .then((dbPosts)=>{
+        res.status(200).json({posts:dbPosts})
+    })
+    .catch((error)=>{
+        console.log('yo');
+        console.log(error);
+    });
+});
 router.post('/createpost',protectedResource,(req,res)=>{
     const {title,body}=req.body;
     if(!title || !body){
@@ -13,7 +36,7 @@ router.post('/createpost',protectedResource,(req,res)=>{
     }
      //console.log(req.dbUser);
       //res.send("Done");
-      req.dbUser.password=undefined
+      req.dbUser.password=undefined//should not send the password
     const post=new PostModel({title:title,body:body,author:req.dbUser})//make post object
 
     post.save()
