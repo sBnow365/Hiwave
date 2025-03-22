@@ -30,14 +30,14 @@ router.get('/myposts',protectedResource,(req,res)=>{
     });
 });
 router.post('/createpost',protectedResource,(req,res)=>{
-    const {title,body}=req.body;
-    if(!title || !body){
+    const {title,body,image}=req.body;
+    if(!title || !body || !image){
         return res.status(400).json({error:"one or more required fields are empty"});//i dont want to continue furthur after encountering this error
     }
      //console.log(req.dbUser);
       //res.send("Done");
       req.dbUser.password=undefined//should not send the password
-    const post=new PostModel({title:title,body:body,author:req.dbUser})//make post object
+    const post=new PostModel({title:title,body:body,image:image ,author:req.dbUser})//make post object
 
     post.save()
     .then((dbPost)=>{
