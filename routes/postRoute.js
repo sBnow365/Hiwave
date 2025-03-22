@@ -47,4 +47,20 @@ router.post('/createpost',protectedResource,(req,res)=>{
         console.log(error);
     });
 });
+//implementing like endpoint
+router.put('/like',protectedResource,(req,res)=>{
+    PostModel.findByIdAndUpdate(req.body.postId,{
+        //likes is an array we have to push
+        $push:{likes: req.dbUser._id}
+    },{
+        new:true    //return  updated record
+
+    }).exec((error,result)=>{
+        if(error){
+            return res.status(400).json({error:error});
+        }else{
+            res.json(result);
+        }
+    })//querymodel find post then update with who liked it
+})
 module.exports=router;
