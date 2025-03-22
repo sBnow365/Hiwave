@@ -5,7 +5,7 @@ const mongoose=require('mongoose');
 const protectedResource = require('../middleware/protectedResource');
 const PostModel=mongoose.model("PostModel");
 
-router.get('/posts',(req,res)=>{
+router.get('/posts',protectedResource,(req,res)=>{
     PostModel.find()
     .populate("author","_id fullName")
     .then((dbPosts)=>{
