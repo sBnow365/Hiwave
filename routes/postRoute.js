@@ -63,4 +63,43 @@ router.put('/like',protectedResource,(req,res)=>{
         }
     })//querymodel find post then update with who liked it
 })
+
+router.put('/unlike',protectedResource,(req,res)=>{
+    PostModel.findByIdAndUpdate(req.body.postId,{
+        //likes is an array we have to pull
+        $pull:{likes: req.dbUser._id}
+    },{
+        new:true    //return  updated record
+
+    }).exec((error,result)=>{
+        if(error){
+            return res.status(400).json({error:error});
+        }else{
+            res.json(result);
+        }
+    })//querymodel find post then update with who liked it
+})
+router.put('/comment',protectedResource,(req,res)=>{
+    
+    const comment={
+        commentText:req.body.commentText,
+        commentedBy:req.dbUser._id
+    };
+
+    PostModel.findByIdAndUpdate(req.body.postId,{
+        //likes is an array we have to pull
+        $pull:{comments: comment }
+    },{
+        new:true    //return  updated record
+
+    })
+    .populate("comments.commentedBy","_id fullName")
+    .exec((error,result)=>{
+        if(error){
+            return res.status(400).json({error:error});
+        }else{
+            res.json(result);
+        }
+    })//querymodel find post then update with who liked it
+})
 module.exports=router;

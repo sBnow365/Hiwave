@@ -18,6 +18,12 @@ const postSchema=new mongoose.Schema({
             ref:"UserModel"
         }
     ],
+    comments:[
+        {
+            commentText:String,
+            commentedBy:{ type :ObjectId, ref:"UserModel"}//link to user object
+        }
+    ],
     image:{
         type:String,
         required:true
