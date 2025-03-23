@@ -38,8 +38,8 @@ router.post('/login',(req,res)=>{
                 //return res.status(200).json({result:"successful Log IN"});//check what happens if i remove return here
                 //create send a token
                 const jwtToken=jwt.sign({_id:dbUser._id},JWT_SECRET);
-                const {_id,fullName,email}=dbUser
-                res.json({token:jwtToken,userInfo: {_id,fullName,email}});//seonding info to the frontend
+                const {_id,fullName,email,followers,following}=dbUser
+                res.json({token:jwtToken,userInfo: {_id,fullName,email,followers,following}});//seonding info to the frontend
             }
             else{
                 return res.status(400).json({error:"Invalid Credentials"});//i dont want to continue furthur after encountering this error
