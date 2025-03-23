@@ -56,7 +56,9 @@ router.put('/like',protectedResource,(req,res)=>{
     },{
         new:true    //return  updated record
 
-    }).exec((error,result)=>{
+    })
+    .populate("author","_id fullName")
+    .exec((error,result)=>{
         if(error){
             return res.status(400).json({error:error});
         }else{
@@ -72,7 +74,9 @@ router.put('/unlike',protectedResource,(req,res)=>{
     },{
         new:true    //return  updated record
 
-    }).exec((error,result)=>{
+    })
+    .populate("author","_id fullName")
+    .exec((error,result)=>{
         if(error){
             return res.status(400).json({error:error});
         }else{
