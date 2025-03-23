@@ -63,65 +63,65 @@ router.post('/createpost',protectedResource,(req,res)=>{
     });
 });
 //implementing like endpoint
-router.put('/like',protectedResource,(req,res)=>{
-    PostModel.findByIdAndUpdate(req.body.postId,{
-        //likes is an array we have to push
-        $push:{likes: req.dbUser._id}
-    },{
-        new:true    //return  updated record
-
+router.put('/like', protectedResource, (req, res) => {
+    PostModel.findByIdAndUpdate(
+        req.body.postId,
+        { $push: { likes: req.dbUser._id } }, // Push user ID to likes array
+        { new: true } // Return updated document
+    )
+    .populate("author", "_id fullName")
+    .then((result) => {  // ✅ Fix: 'result' is the first argument
+        res.json(result);
     })
-    .populate("author","_id fullName")
-    .exec((error,result)=>{
-        if(error){
-            return res.status(400).json({error:error});
-        }else{
-            res.json(result);
-        }
-    })//querymodel find post then update with who liked it
-})
+    .catch((error) => {  // ✅ Fix: Handle errors properly
+        console.error("Error in like API:", error);
+        res.status(400).json({ error: error.message });
+    });
+});
 
-router.put('/unlike',protectedResource,(req,res)=>{
-    PostModel.findByIdAndUpdate(req.body.postId,{
-        //likes is an array we have to pull
-        $pull:{likes: req.dbUser._id}
-    },{
-        new:true    //return  updated record
 
+router.put('/unlike', protectedResource, (req, res) => {
+    PostModel.findByIdAndUpdate(
+        req.body.postId,
+        { $pull: { likes: req.dbUser._id } }, // ✅ Remove user ID from likes array
+        { new: true } // ✅ Return updated document
+    )
+    .populate("author", "_id fullName")
+    .then((result) => { 
+        res.json(result);
     })
-    .populate("author","_id fullName")
-    .exec((error,result)=>{
-        if(error){
-            return res.status(400).json({error:error});
-        }else{
-            res.json(result);
-        }
-    })//querymodel find post then update with who liked it
-})
-router.put('/comment',protectedResource,(req,res)=>{
-    
-    const comment={
-        commentText:req.body.commentText,
-        commentedBy:req.dbUser._id
+    .catch((error) => {
+        console.error("Error in unlike API:", error);
+        res.status(400).json({ error: error.message });
+    });
+});
+
+router.put("/comment", protectedResource, (req, res) => {
+    console.log("Received Comment Request:", req.body); // Debugging log
+
+    const comment = {
+        commentText: req.body.commentText,
+        commentedBy: req.dbUser._id
     };
 
-    PostModel.findByIdAndUpdate(req.body.postId,{
-        //likes is an array we have to pull
-        $push:{comments: comment }
-    },{
-        new:true    //return  updated record
-
+    PostModel.findByIdAndUpdate(
+        req.body.postId,
+        { $push: { comments: comment } },
+        { new: true }
+    )
+    .populate("comments.commentedBy", "_id fullName")
+    .populate("author", "_id fullName")
+    .then((result) => {
+        console.log("Updated Post with Comment:", result); // Debugging log
+        res.json(result);
     })
-    .populate("comments.commentedBy","_id fullName")
-    .populate("author","_id fullName")
-    .exec((error,result)=>{
-        if(error){
-            return res.status(400).json({error:error});
-        }else{
-            res.json(result);
-        }
-    })//querymodel find post then update with who liked it
-})
+    .catch((error) => {
+        console.error("Error in Comment API:", error);
+        res.status(400).json({ error: error.message });
+    });
+});
+
+
 router.delete("/deletepost/:postId",protectedResource,(req,res)=>{
     PostModel.findOne({_id:req.params.postId})
     .populate("author","_id")

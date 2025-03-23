@@ -20,7 +20,7 @@ const CustomRouting = () => {
     if(user){
       dispatch({type: "USER", payload
       : user});
-      navigate('/');//user logged in so redirect to home page
+      // navigate('/');//user logged in so redirect to home page
     }
     else{
       navigate('/login');
