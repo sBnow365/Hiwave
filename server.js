@@ -22,6 +22,7 @@ require('./models/post_model'); //not exported right now
 app.use(express.json());//will convert everything that comes from middleware into json
 app.use(require('./routes/authentication'));
 app.use(require('./routes/postRoute'));
+app.use(require('./routes/userRoute'));
 
 
 app.listen(PORT, ()=>{
