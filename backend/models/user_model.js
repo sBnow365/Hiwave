@@ -1,6 +1,4 @@
-mongoose.model("UserModel",userSchema);
-
-const mongoose = require('mongoose'); // Import mongoose
+const mongoose = require('mongoose'); // Import mongoose first
 
 const userSchema = new mongoose.Schema({
     fullName: {
@@ -15,13 +13,14 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    profilePicUrl :{
-        type:String,
-        default :"https://res-console.cloudinary.com/dku7k2gnt/thumbnails/v1/image/upload/v1742651631/c2FtcGxlcy9sb2dv/drilldown"//if no image given
+    profilePicUrl: {
+        type: String,
+        default: "https://res-console.cloudinary.com/dku7k2gnt/thumbnails/v1/image/upload/v1742651631/c2FtcGxlcy9sb2dv/drilldown" // Default profile image
     },
-    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "UserModel" }], // Fix ObjectId reference
-    following: [{ type: mongoose.Schema.Types.ObjectId, ref: "UserModel" }]  // Fix ObjectId reference
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "UserModel" }], // Correct ObjectId reference
+    following: [{ type: mongoose.Schema.Types.ObjectId, ref: "UserModel" }]  // Correct ObjectId reference
 });
 
-// Export the model
-module.exports = mongoose.model("UserModel", userSchema);
+// Export the model (this should come after defining schema)
+const UserModel = mongoose.model("UserModel", userSchema);
+module.exports = UserModel;
