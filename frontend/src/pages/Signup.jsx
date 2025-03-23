@@ -1,14 +1,21 @@
 import React, {useState} from 'react'
-import {Link} from 'react-router-dom'
+import {Link , useNavigate} from 'react-router-dom'
 import M from 'materialize-css';
 import './Signup.css'
 
 function SignUp() {
+  const navigate = useNavigate();
   const[fullName, setFullName] = useState("");
   const[email, setEmail] = useState("");
   const[password, setPassword] = useState("");
 
   const register = ()=>{
+    if(!/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(email)){
+      M.toast({html: "Enter valid email" , classes: "#c62828 red darken-3"})
+      return
+      
+    }
+
     fetch("/api/register",{
       method: "post",
       headers: {
@@ -27,8 +34,12 @@ function SignUp() {
         M.toast({html: data.error , classes: "#c62828 red darken-3"})
       }
       else{
-        M.toast({html: data.result , classes: "#388e3c green darken-2"})  
+        M.toast({html: data.result , classes: "#388e3c green darken-2"})
+        navigate('/login');  
       }
+    }).catch(error => {
+      console.error("Error:", error);
+      M.toast({ html: "Something went wrong!", classes: "#c62828 red darken-3" });
     });
   }
 
