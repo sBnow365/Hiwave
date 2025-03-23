@@ -12,6 +12,8 @@ const userSchema=new mongoose.Schema({
     password:{
         type:String,
         required:true
-    }
+    },
+    followers:[{type:ObjectId,ref:"UserModel"}],
+    following:[{type:ObjectId,ref:"UserModel"}]
 })
 mongoose.model("UserModel",userSchema);
