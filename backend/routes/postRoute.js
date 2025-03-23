@@ -7,7 +7,21 @@ const PostModel=mongoose.model("PostModel");
 
 router.get('/posts',protectedResource,(req,res)=>{
     PostModel.find()
-    .populate("author","_id fullName")
+    .populate("author","_id fullName profilePicUrl")
+    .populate("comments.commentedBy","_id fullName profilePicUrl")    
+    .then((dbPosts)=>{
+        res.status(200).json({posts:dbPosts})
+    })
+    .catch((error)=>{
+        console.log('yo');
+        console.log(error);
+    });
+});
+
+router.get('/postsfromfollowing',protectedResource,(req,res)=>{
+    PostModel.find({author:{$in:req.dbUser.following}})//return posts of not everyone kind of for loop
+    .populate("author","_id fullName profilePicUrl")
+    .populate("comments.commentedBy","_id fullName profilePicUrl")    
     .then((dbPosts)=>{
         res.status(200).json({posts:dbPosts})
     })
@@ -20,8 +34,8 @@ router.get('/posts',protectedResource,(req,res)=>{
 //whatever we pass to protected route as db user will be forwarded to this endpoint
 router.get('/myposts',protectedResource,(req,res)=>{
     PostModel.find({author : req.dbUser._id })
-    .populate("author","_id fullName")
-    .populate("comments.commentedBy","_id fullName")
+    .populate("author","_id fullName profilePicUrl")
+    .populate("comments.commentedBy","_id fullName profilePicUrl")    
     .then((dbPosts)=>{
         res.status(200).json({posts:dbPosts})
     })

@@ -38,8 +38,8 @@ router.post('/login',(req,res)=>{
                 //return res.status(200).json({result:"successful Log IN"});//check what happens if i remove return here
                 //create send a token
                 const jwtToken=jwt.sign({_id:dbUser._id},JWT_SECRET);
-                const {_id,fullName,email}=dbUser
-                res.json({token:jwtToken,userInfo: {_id,fullName,email}});//seonding info to the frontend
+                const {_id,fullName,email,followers,following,profilePicUrl}=dbUser
+                res.json({token:jwtToken,userInfo: {_id,fullName,email,followers,following,profilePicUrl}});//seonding info to the frontend
             }
             else{
                 return res.status(400).json({error:"Invalid Credentials"});//i dont want to continue furthur after encountering this error
@@ -52,7 +52,7 @@ router.post('/login',(req,res)=>{
 });
 router.post('/register',(req,res)=>{
     console.log(req.body);
-    const {fullName,email,password}=req.body;//object destructuring
+    const {fullName,email,password,profilePicUrl}=req.body;//object destructuring
     if(!fullName || !email || !password)
     {
         return res.status(400).json({error:"one or more required fields are empty"});//i dont want to continue furthur after encountering this error
@@ -67,7 +67,7 @@ router.post('/register',(req,res)=>{
         bcrypt.hash(password,16)//high alue higher encryption
         .then((hashedPassword)=>{
             
-            const user=new UserModel({fullName,email,password:hashedPassword})//var names should be same
+            const user=new UserModel({fullName,email,password:hashedPassword,profilePicUrl:profilePicUrl})//var names should be same
             user.save()
             .then((u)=>{
                 res.status(201).json({result:"successful registration"});
