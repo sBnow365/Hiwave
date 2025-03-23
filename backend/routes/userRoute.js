@@ -40,6 +40,7 @@ router.put('/follow',protectedResource,(req,res)=>{//check breacket structure
         UserModel.findByIdAndUpdate(req.dbUser.id,{
             $push:{following :req.body.followId}
         },{new:true})
+        .select("-password")
         .then(result => res.json(result))
         .catch(error=>{
             return res.status(400).json({error:error})
@@ -59,6 +60,7 @@ router.put('/unfollow',protectedResource,(req,res)=>{//check breacket structure
         UserModel.findByIdAndUpdate(req.dbUser.id,{
             $pull:{following :req.body.followId}
         },{new:true})
+        .select("-password")
         .then(result => res.json(result))
         .catch(error=>{
             return res.status(400).json({error:error})
