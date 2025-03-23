@@ -21,6 +21,7 @@ router.get('/posts',protectedResource,(req,res)=>{
 router.get('/myposts',protectedResource,(req,res)=>{
     PostModel.find({author : req.dbUser._id })
     .populate("author","_id fullName")
+    .populate("comments.commentedBy","_id fullName")
     .then((dbPosts)=>{
         res.status(200).json({posts:dbPosts})
     })
@@ -88,12 +89,13 @@ router.put('/comment',protectedResource,(req,res)=>{
 
     PostModel.findByIdAndUpdate(req.body.postId,{
         //likes is an array we have to pull
-        $pull:{comments: comment }
+        $push:{comments: comment }
     },{
         new:true    //return  updated record
 
     })
     .populate("comments.commentedBy","_id fullName")
+    .populate("author","_id fullName")
     .exec((error,result)=>{
         if(error){
             return res.status(400).json({error:error});
@@ -101,5 +103,24 @@ router.put('/comment',protectedResource,(req,res)=>{
             res.json(result);
         }
     })//querymodel find post then update with who liked it
+})
+router.delete("/deletepost/:postId",protectedResource,(req,res)=>{
+    PostModel.findOne({_id:req.params.postId})
+    .populate("author","_id")
+    exec((error,post)=>{
+        if(error || !post){
+            return res.status(400).json({error:error});
+        }
+        if(post.author._id.toString()===req.dbUser._id.toString()){
+            post.remove()
+            .then((data)=>{
+                res.json({result:"post deleted successfully"})
+            })
+            .catch((e)=>{
+                console.log(e);
+                
+            })
+        }
+    })
 })
 module.exports=router;
