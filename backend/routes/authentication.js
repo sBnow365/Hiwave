@@ -22,34 +22,35 @@ router.get('/secured',protectedResource,(req,res)=>{
 });
 
 
-router.post('/login',(req,res)=>{
-    const {email,password}=req.body;//destructuring
-    if(!email || !password){
-        return res.status(400).json({error:"one or more required fields are empty"});//i dont want to continue furthur after encountering this error
+router.post('/login', (req, res) => {
+    const { email, password } = req.body; // Destructuring
+    if (!email || !password) {
+        return res.status(400).json({ error: "One or more required fields are empty" });
     }
-    UserModel.findOne({email:email})
-    .then((dbUser)=>{
-        if(!dbUser){//user not found
-            return res.status(400).json({error:"User not found"});//i dont want to continue furthur after encountering this error
-        }
-        bcrypt.compare(password,dbUser.password)
-        .then((didMatch)=>{
-            if(didMatch){
-                //return res.status(200).json({result:"successful Log IN"});//check what happens if i remove return here
-                //create send a token
-                const jwtToken=jwt.sign({_id:dbUser._id},JWT_SECRET);
-                const {_id,fullName,email,followers,following,profilePicUrl}=dbUser
-                res.json({token:jwtToken,userInfo: {_id,fullName,email,followers,following,profilePicUrl}});//seonding info to the frontend
+
+    UserModel.findOne({ email: email })
+        .then((dbUser) => {
+            if (!dbUser) {
+                return res.status(400).json({ error: "User not found" });
             }
-            else{
-                return res.status(400).json({error:"Invalid Credentials"});//i dont want to continue furthur after encountering this error
-            }
+
+            return bcrypt.compare(password, dbUser.password)
+                .then((didMatch) => {
+                    if (didMatch) {
+                        const jwtToken = jwt.sign({ _id: dbUser._id }, JWT_SECRET);
+                        const { _id, fullName, email, followers, following, profilePicUrl } = dbUser;
+                        return res.json({ token: jwtToken, userInfo: { _id, fullName, email, followers, following, profilePicUrl } });
+                    } else {
+                        return res.status(400).json({ error: "Invalid Credentials" });
+                    }
+                });
         })
-    })
-    .catch((error)=>{
-        console.log(error);
-    });
+        .catch((error) => {
+            console.error("Error during login:", error);
+            return res.status(500).json({ error: "Internal Server Error" });
+        });
 });
+
 router.post('/register',(req,res)=>{
     console.log(req.body);
     const {fullName,email,password,profilePicUrl}=req.body;//object destructuring

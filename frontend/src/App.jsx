@@ -8,6 +8,7 @@ import CreatePost from './pages/CreatePost';
 import './App.css';
 import { useEffect, createContext, useReducer, useContext } from 'react';
 import { userReducer, initialState } from './reducers/userReducer.jsx';
+import OtherUserProfile from './pages/OtherUserProfile';
 
 export const UserContext = createContext();  //creating a user context
 
@@ -33,6 +34,7 @@ const CustomRouting = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/profile" element={<Profile />} />
+      <Route path="/profile/:userId" element={<OtherUserProfile />} />
       <Route path="/create-post" element={<CreatePost />} />
     </Routes>
   );

@@ -1,27 +1,33 @@
-const jwt=require('jsonwebtoken');
-const {JWT_SECRET}=require('../config');
+const jwt = require('jsonwebtoken');
+const { JWT_SECRET } = require('../config');
+const mongoose = require('mongoose');
+const UserModel = mongoose.model("UserModel");
 
-
-const mongoose=require('mongoose');
-const UserModel=mongoose.model("UserModel");
-
-module.exports=(req,res,next)=>{
-    //authorization header->bearer dfsdfsdfs (same token)
-    const {authorization}=req.headers;
-    if(!authorization){
-        return res.status(401).json({error:"User not logged in"});//i dont want to continue furthur after encountering this error
+module.exports = async (req, res, next) => {
+    // Extract authorization header
+    const { authorization } = req.headers;
+    if (!authorization) {
+        return res.status(401).json({ error: "User not logged in" }); // Stops execution
     }
-    const token=authorization.replace("Bearer ","");
-    jwt.verify(token,JWT_SECRET,(error,payload)=>{
-        if(error){
-            return res.status(401).json({error:"User not logged in"});//i dont want to continue furthur after encountering this error
+
+    // Extract the token
+    const token = authorization.replace("Bearer ", "");
+
+    try {
+        // Verify JWT token
+        const payload = jwt.verify(token, JWT_SECRET);
+        const { _id } = payload;
+
+        // Find user by ID
+        const dbUser = await UserModel.findById(_id);
+        if (!dbUser) {
+            return res.status(401).json({ error: "User not found" }); // Stops execution if user doesn't exist
         }
-        const {_id}=payload;
-        UserModel.findById(_id)// why do we use findByid over findid
-        .then(dbUser=>{
-            req.dbUser=dbUser;
-            next();//waiting required only when user found then go next
-        });
-        //forward the request to the next middleware or next route
-    })
-}
+
+        // Attach user data to request and proceed
+        req.dbUser = dbUser;
+        next();
+    } catch (error) {
+        return res.status(401).json({ error: "User not logged in" }); // Handles token errors or DB errors
+    }
+};

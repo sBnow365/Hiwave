@@ -121,24 +121,81 @@ router.put("/comment", protectedResource, (req, res) => {
     });
 });
 
+router.delete("/deletepost/:postId", protectedResource, (req, res) => {
+    console.log("Received delete request for Post ID:", req.params.postId);
+    console.log("Authenticated User:", req.dbUser);
 
-router.delete("/deletepost/:postId",protectedResource,(req,res)=>{
-    PostModel.findOne({_id:req.params.postId})
-    .populate("author","_id")
-    exec((error,post)=>{
-        if(error || !post){
-            return res.status(400).json({error:error});
-        }
-        if(post.author._id.toString()===req.dbUser._id.toString()){
-            post.remove()
-            .then((data)=>{
-                res.json({result:"post deleted successfully"})
-            })
-            .catch((e)=>{
-                console.log(e);
-                
-            })
-        }
-    })
-})
+    PostModel.findOne({ _id: req.params.postId })
+        .populate("author", "_id")
+        .then(post => {
+            if (!post) {
+                console.log("Post not found in database.");
+                return res.status(404).json({ error: "Post not found" });
+            }
+
+            console.log("Post Author ID:", post.author._id.toString());
+            console.log("Request User ID:", req.dbUser._id.toString());
+
+            if (post.author._id.toString() !== req.dbUser._id.toString()) {
+                console.log("Unauthorized deletion attempt.");
+                return res.status(403).json({ error: "Unauthorized action" });
+            }
+
+            PostModel.deleteOne({ _id: req.params.postId })
+                .then(() => {
+                    res.json({ message: "Post deleted successfully" });
+                })
+                .catch(error => {
+                    console.error("Error deleting post:", error);
+                    res.status(500).json({ error: "Internal server error" });
+                });
+        })
+        .catch(error => {
+            console.error("Error finding post:", error);
+            res.status(500).json({ error: "Internal server error" });
+        });
+});
+
+router.delete("/deletecomment/:postId/:commentId", protectedResource, (req, res) => {
+    const { postId, commentId } = req.params;
+
+    PostModel.findById(postId)
+        .populate("comments.commentedBy", "_id") // Ensure author data is available
+        .then(post => {
+            if (!post) {
+                return res.status(404).json({ error: "Post not found" });
+            }
+
+            // Find comment to delete
+            const comment = post.comments.find(c => c._id.toString() === commentId);
+            if (!comment) {
+                return res.status(404).json({ error: "Comment not found" });
+            }
+
+            // Check if the logged-in user is the author of the comment
+            if (comment.commentedBy._id.toString() !== req.dbUser._id.toString()) {
+                return res.status(403).json({ error: "Unauthorized action" });
+            }
+
+            // Remove comment from the post's comments array
+            post.comments = post.comments.filter(c => c._id.toString() !== commentId);
+
+            // Save updated post
+            post.save()
+                .then(updatedPost => {
+                    res.json({ message: "Comment deleted successfully", updatedPost });
+                })
+                .catch(error => {
+                    console.error("Error saving post after deleting comment:", error);
+                    res.status(500).json({ error: "Internal server error" });
+                });
+        })
+        .catch(error => {
+            console.error("Error finding post:", error);
+            res.status(500).json({ error: "Internal server error" });
+        });
+});
+
+
+
 module.exports=router;
