@@ -9,6 +9,7 @@ import './App.css';
 import { useEffect, createContext, useReducer, useContext } from 'react';
 import { userReducer, initialState } from './reducers/userReducer.jsx';
 import OtherUserProfile from './pages/OtherUserProfile';
+import Postsfromfollowing from './pages/Postsfromfollowing';
 
 export const UserContext = createContext();  //creating a user context
 
@@ -36,6 +37,7 @@ const CustomRouting = () => {
       <Route exact path="/profile" element={<Profile />} />
       <Route path="/profile/:userId" element={<OtherUserProfile />} />
       <Route path="/create-post" element={<CreatePost />} />
+      <Route path="/postsfromfollowing" element={<Postsfromfollowing />} />
     </Routes>
   );
 };

@@ -40,44 +40,73 @@ router.get('/user/:userId', protectedResource, async (req, res) => {
 
 
 module.exports = router;
-router.put('/follow',protectedResource,(req,res)=>{//check breacket structure
-    //req.body.followed=userId of not logged in user
-    UserModel.findByIdAndUpdate(req.body.followId,{//push into not logged in's account my user id when x follow's him
-        $push:{followers :req.dbUser}
-    },{
-        new:true
-    },(error,result)=>{
-        if(error){
-            return res.status(400).json({error:error})
+router.put('/follow', protectedResource, async (req, res) => {
+    try {
+        const { followId } = req.body;
+        const userId = req.dbUser._id;
+
+        if (!followId) {
+            return res.status(400).json({ error: "followId is required" });
         }
-        UserModel.findByIdAndUpdate(req.dbUser.id,{
-            $push:{following :req.body.followId}
-        },{new:true})
-        .select("-password")
-        .then(result => res.json(result))
-        .catch(error=>{
-            return res.status(400).json({error:error})
-        })
-    })
-});
-router.put('/unfollow',protectedResource,(req,res)=>{//check breacket structure
-    //req.body.followed=userId of not logged in user
-    UserModel.findByIdAndUpdate(req.body.followId,{//push into not logged in's account my user id when x follow's him
-        $pull:{followers :req.dbUser}
-    },{
-        new:true
-    },(error,result)=>{
-        if(error){
-            return res.status(400).json({error:error})
+
+        // Add logged-in user to the other user's followers
+        const updatedUser = await UserModel.findByIdAndUpdate(
+            followId,
+            { $addToSet: { followers: userId } },  // Prevent duplicates
+            { new: true }
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({ error: "User not found" });
         }
-        UserModel.findByIdAndUpdate(req.dbUser.id,{
-            $pull:{following :req.body.followId}
-        },{new:true})
-        .select("-password")
-        .then(result => res.json(result))
-        .catch(error=>{
-            return res.status(400).json({error:error})
-        })
-    })
+
+        // Add the other user to the logged-in user's following list
+        const currentUser = await UserModel.findByIdAndUpdate(
+            userId,
+            { $addToSet: { following: followId } },  // Prevent duplicates
+            { new: true }
+        ).select("-password");
+
+        res.json(currentUser);
+    } catch (error) {
+        console.error("Error in follow:", error);
+        res.status(500).json({ error: error.message });
+    }
 });
+
+
+router.put('/unfollow', protectedResource, async (req, res) => {
+    try {
+        const { followId } = req.body;
+        const userId = req.dbUser._id;
+
+        if (!followId) {
+            return res.status(400).json({ error: "followId is required" });
+        }
+
+        // Remove from the other user's followers list
+        const updatedUser = await UserModel.findByIdAndUpdate(
+            followId,
+            { $pull: { followers: userId } },
+            { new: true }
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        // Remove from the logged-in user's following list
+        const currentUser = await UserModel.findByIdAndUpdate(
+            userId,
+            { $pull: { following: followId } },
+            { new: true }
+        ).select("-password");
+
+        res.json(currentUser);
+    } catch (error) {
+        console.error("Error in unfollow:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 module.exports=router;

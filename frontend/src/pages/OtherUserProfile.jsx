@@ -7,7 +7,7 @@ function OtherUserProfile() {
   const [userData, setUserData] = useState(null); 
   const [myposts, setMyPosts] = useState([]); 
   const { userId } = useParams();
-  const { state } = useContext(UserContext);
+  const { state, dispatch } = useContext(UserContext); // Include dispatch
 
   useEffect(() => {
     if (!userId) {
@@ -45,14 +45,82 @@ function OtherUserProfile() {
 
   }, [userId]);
 
+  const follow = () => {
+    fetch(`/api/follow`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+      body: JSON.stringify({ followId: userId }),
+    })
+      .then((response) => response.json())
+      .then((updatedUser) => {
+        setUserData((prev) => ({
+          ...prev,//expand what we currently have in state
+          followers: [...prev.followers, state._id],
+        }));
+
+        dispatch({
+          type: "UPDATE",
+          payload: {
+            followers: updatedUser.followers,
+            following: [...state.following, userId],
+          },
+        });
+
+        //updating the local storage
+        localStorage.setItem("userInfo", JSON.stringify(updatedUser));
+
+        M.toast({ html: "Followed Successfully!", classes: "green darken-2" });
+      })
+      .catch((error) => {
+        console.error("Error updating likes:", error);
+        M.toast({ html: "Something went wrong!", classes: "red darken-3" });
+      });
+  };
+
+  const unfollow = () => {
+    fetch(`/api/unfollow`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+      body: JSON.stringify({ followId: userId }),
+    })
+      .then((response) => response.json())
+      .then((updatedUser) => {
+        setUserData((prev) => ({
+          ...prev,
+          followers: prev.followers.filter((id) => id !== state._id),
+        }));
+
+        dispatch({
+          type: "UPDATE",
+          payload: {
+            followers: updatedUser.followers,
+            following: state.following.filter((id) => id !== userId),
+          },
+        });
+  
+        localStorage.setItem("userInfo", JSON.stringify(updatedUser));
+
+        M.toast({ html: "Unfollowed Successfully!", classes: "red darken-2" });
+      })
+      .catch((error) => {
+        console.error("Error updating likes:", error);
+        M.toast({ html: "Something went wrong!", classes: "red darken-3" });
+      });
+  };
+  
   return (
     <div className='main-container'>
       <div className='profile-container'>
         <div>
-          {/* ✅ Fix: Correctly display the profile picture */}
           <img 
             style={{ width: "166px", height: "166px", borderRadius: "83px" }} 
-            src = 'https://images.unsplash.com/photo-1504593811423-6dd665756598?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
+            src={user.Profile.user.profilePicUrl}
             alt="Profile"
           />
         </div>
@@ -64,6 +132,11 @@ function OtherUserProfile() {
             <h6>{userData?.followers?.length || 0} followers</h6>
             <h6>{userData?.following?.length || 0} following</h6>
           </div>
+          {!userData?.followers?.includes(state._id) ? (
+            <button style={{margin: "10px"}} onClick={follow} className="btn waves-effect waves-light  #0d47a1 blue darken-4">Follow</button>
+          ) : (
+            <button style={{margin: "10px"}} onClick={unfollow} className="btn waves-effect waves-light  red darken-4">Unfollow</button>
+          )}
         </div>
       </div>
 
