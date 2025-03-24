@@ -2,6 +2,7 @@ import React , {useState , useEffect , useContext} from 'react'
 import './Home.css'
 import M from 'materialize-css';
 import {UserContext} from '../App'
+import { Link } from 'react-router-dom';
 
 function Home() {//home page
 
@@ -162,7 +163,7 @@ function Home() {//home page
           return(
             <div className='card home-card' key={post._id}>
                 <h5 style={{padding:"10px"}}>
-                  {post.author?.fullName || "Unknown Author"}
+                  <Link to={post.author._id !== state._id ?"/profile/"+post.author._id:"/profile"}>{post.author?.fullName || "Unknown Author"}</Link>
 
                   {post.author._id === state._id 
                   && <i onClick={()=>deletePost(post._id)} className="material-icons" style={{color:"red" , cursor: "pointer" , float: "right" , fontSize: "30px"}}>delete_forever</i> }
