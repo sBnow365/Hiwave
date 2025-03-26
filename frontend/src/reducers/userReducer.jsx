@@ -8,10 +8,10 @@ export const userReducer = (state, action) => {
     }
     if(action.type === "UPDATE"){
         return{
-            ...state,//exxpand what we currently have in state
-            following: action.payload.following,//append to the state
-            followers: action.payload.followers
-        }
+            ...state, //expand what we currently have in state
+            followers: action.payload.followers, //append to the state
+            following: action.payload.follow //append to the state
+        };
     }
     return state;
 }

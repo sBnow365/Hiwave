@@ -38,75 +38,65 @@ router.get('/user/:userId', protectedResource, async (req, res) => {
     }
 });
 
+router.put('/follow', protectedResource, async (req, res) => {
+    const { followId } = req.body; // User to be followed
+
+    if (!followId) {
+        return res.status(400).json({ error: 'FollowId is required' });
+    }
+
+    try {
+        // Add the logged-in user to the followed user's followers list
+        await UserModel.findByIdAndUpdate(
+            followId,
+            { $push: { followers: req.dbUser.id } },
+            { new: true }
+        );
+
+        // Add the followed user to the logged-in user's following list
+        const updatedUser = await UserModel.findByIdAndUpdate(
+            req.dbUser.id,
+            { $push: { following: followId } },
+            { new: true }
+        ).select('-password');
+
+        res.json(updatedUser);
+    } catch (error) {
+        console.error("Error in follow route:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
+// Endpoint for unfollowing a user
+router.put('/unfollow', protectedResource, async (req, res) => {
+    const { unfollowId } = req.body; // User to be unfollowed
+
+    if (!unfollowId) {
+        return res.status(400).json({ error: 'UnfollowId is required' });
+    }
+
+    try {
+        // Remove the logged-in user from the unfollowed user's followers list
+        await UserModel.findByIdAndUpdate(
+            unfollowId,
+            { $pull: { followers: req.dbUser.id } },
+            { new: true }
+        );
+
+        // Remove the unfollowed user from the logged-in user's following list
+        const updatedUser = await UserModel.findByIdAndUpdate(
+            req.dbUser.id,
+            { $pull: { following: unfollowId } },
+            { new: true }
+        ).select('-password');
+
+        res.json(updatedUser);
+    } catch (error) {
+        console.error("Error in unfollow route:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 
 module.exports = router;
-router.put('/follow', protectedResource, async (req, res) => {
-    try {
-        const { followId } = req.body;
-        const userId = req.dbUser._id;
-
-        if (!followId) {
-            return res.status(400).json({ error: "followId is required" });
-        }
-
-        // Add logged-in user to the other user's followers
-        const updatedUser = await UserModel.findByIdAndUpdate(
-            followId,
-            { $addToSet: { followers: userId } },  // Prevent duplicates
-            { new: true }
-        );
-
-        if (!updatedUser) {
-            return res.status(404).json({ error: "User not found" });
-        }
-
-        // Add the other user to the logged-in user's following list
-        const currentUser = await UserModel.findByIdAndUpdate(
-            userId,
-            { $addToSet: { following: followId } },  // Prevent duplicates
-            { new: true }
-        ).select("-password");
-
-        res.json(currentUser);
-    } catch (error) {
-        console.error("Error in follow:", error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-
-router.put('/unfollow', protectedResource, async (req, res) => {
-    try {
-        const { followId } = req.body;
-        const userId = req.dbUser._id;
-
-        if (!followId) {
-            return res.status(400).json({ error: "followId is required" });
-        }
-
-        // Remove from the other user's followers list
-        const updatedUser = await UserModel.findByIdAndUpdate(
-            followId,
-            { $pull: { followers: userId } },
-            { new: true }
-        );
-
-        if (!updatedUser) {
-            return res.status(404).json({ error: "User not found" });
-        }
-
-        // Remove from the logged-in user's following list
-        const currentUser = await UserModel.findByIdAndUpdate(
-            userId,
-            { $pull: { following: followId } },
-            { new: true }
-        ).select("-password");
-
-        res.json(currentUser);
-    } catch (error) {
-        console.error("Error in unfollow:", error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-module.exports=router;
