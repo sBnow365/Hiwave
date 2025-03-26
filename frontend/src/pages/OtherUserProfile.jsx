@@ -49,7 +49,7 @@ function OtherUserProfile() {
     <div className='main-container'>
       <div className='profile-container'>
         <div>
-          {/* ✅ Fix: Correctly display the profile picture */}
+          {/*display the profile picture */}
           <img 
             style={{ width: "166px", height: "166px", borderRadius: "83px" }} 
             src = 'https://images.unsplash.com/photo-1504593811423-6dd665756598?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
