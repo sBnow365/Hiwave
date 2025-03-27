@@ -6,9 +6,9 @@ import M from 'materialize-css';
 function OtherUserProfile() {
   const [userData, setUserData] = useState(null);
   const [myposts, setMyPosts] = useState([]);
-  const [isFollowing, setIsFollowing] = useState(false); // Toggle follow state
+  const [isFollowing, setIsFollowing] = useState(false); 
   const { userId } = useParams();
-  const { state, dispatch } = useContext(UserContext);  // Logged-in user
+  const { state, dispatch } = useContext(UserContext);  
 
   useEffect(() => {
     

@@ -49,7 +49,7 @@ router.put('/follow', protectedResource, async (req, res) => {
         // Add the logged-in user to the followed user's followers list
         await UserModel.findByIdAndUpdate(
             followId,
-            { $push: { followers: req.dbUser.id } },
+            { $push: { followers: req.dbUser._id } },
             { new: true }
         );
 
@@ -80,13 +80,13 @@ router.put('/unfollow', protectedResource, async (req, res) => {
         // Remove the logged-in user from the unfollowed user's followers list
         await UserModel.findByIdAndUpdate(
             unfollowId,
-            { $pull: { followers: req.dbUser.id } },
+            { $pull: { followers: req.dbUser._id } },
             { new: true }
         );
 
         // Remove the unfollowed user from the logged-in user's following list
         const updatedUser = await UserModel.findByIdAndUpdate(
-            req.dbUser.id,
+            req.dbUser._id,
             { $pull: { following: unfollowId } },
             { new: true }
         ).select('-password');
