@@ -71,7 +71,7 @@ function OtherUserProfile() {
     })
     .then((updatedUser) => {
         console.log("Updated User:", updatedUser);
-        dispatch({type: "UPDATE", payload: {followers: updatedUser.followers , followers: updatedUser.followers}});
+        dispatch({ type: "UPDATE", payload: { followers: updatedUser.followers } });
         localStorage.setItem("user", JSON.stringify(updatedUser));
         setUserData((prevData) => ({
             ...prevData,
@@ -106,7 +106,7 @@ const unfollow = () => {
   })
   .then((updatedUser) => {
       console.log("Updated User After Unfollow:", updatedUser);
-      dispatch({type: "UPDATE", payload: {followers: updatedUser.followers , followers: updatedUser.followers}});
+      dispatch({ type: "UPDATE", payload: { followers: updatedUser.followers } });
       localStorage.setItem("user", JSON.stringify(updatedUser));
 
       setUserData((prevData) => ({
