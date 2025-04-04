@@ -53,7 +53,7 @@ router.post('/login', (req, res) => {
 
 router.post('/register',(req,res)=>{
     console.log(req.body);
-    const {fullName,email,password,profilePicUrl}=req.body;//object destructuring
+    const {fullName,email,password,profilePic}=req.body;//object destructuring
     if(!fullName || !email || !password)
     {
         return res.status(400).json({error:"one or more required fields are empty"});//i dont want to continue furthur after encountering this error
@@ -68,7 +68,8 @@ router.post('/register',(req,res)=>{
         bcrypt.hash(password,16)//high alue higher encryption
         .then((hashedPassword)=>{
             
-            const user=new UserModel({fullName,email,password:hashedPassword,profilePicUrl:profilePicUrl})//var names should be same
+            const user=new UserModel({fullName,email,password:hashedPassword,profilePicUrl:profilePic})//var names should be same
+           console.log(user)
             user.save()
             .then((u)=>{
                 res.status(201).json({result:"successful registration"});
