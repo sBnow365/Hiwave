@@ -1,4 +1,4 @@
-require('dotenv').config();
+// require('dotenv').config()
 const express=require('express');
 const app=express();
 const mongoose=require('mongoose'); 
@@ -25,8 +25,8 @@ app.use(require('./routes/authentication'));
 app.use(require('./routes/postRoute'));
 app.use(require('./routes/userRoute'));
 
-const uploadCloud=require('./routes/upload');
-app.use('/api',uploadCloud);
+// const uploadCloud=require('./routes/upload');
+// app.use('/api',uploadCloud);
 
 app.listen(PORT, ()=>{
     console.log("server started");

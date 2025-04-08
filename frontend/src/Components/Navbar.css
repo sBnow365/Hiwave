@@ -19,7 +19,7 @@ nav .nav-wrapper {
 }
 
 .brand-logo {
-    font-family: 'Grand Hotel', cursive, 'Roboto', sans-serif;
+    font-family: 'Grand Hotel', cursive, 'Roboto', sans-serif ;
     font-size: 2.2rem !important;
     color: white !important;
     letter-spacing: 1px;

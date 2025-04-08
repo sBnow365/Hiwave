@@ -1,5 +1,500 @@
-#toast-container{
+/* Signup.css - Custom styling for the Instagram clone signup page */
+
+/* Container for the signup form */
+.signup-container {
+    max-width: 450px;
+    margin: 80px auto;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    padding: 30px;
+    text-align: center;
+}
+
+/* Form header and logo styling */
+.signup-header {
+    margin-bottom: 30px;
+}/* Signup.css - Custom styling for the Instagram clone signup page */
+
+/* Import the Grand Hotel font if not imported globally */
+@import url('https://fonts.googleapis.com/css2?family=Grand+Hotel&display=swap');
+
+/* Container for the signup form */
+.signup-container {
+    max-width: 450px;
+    margin: 80px auto;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    padding: 30px;
+    text-align: center;
+}
+
+/* Form header and logo styling */
+.signup-header {
+    margin-bottom: 30px;
+}
+
+.signup-logo {
+    font-family: 'Grand Hotel', cursive !important;
+    font-size: 3rem;
+    color: #3f51b5;
+    margin-bottom: 10px;
+    display: inline-block;
+}
+
+.signup-logo:before {
+    content: '';
+    display: inline-block;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%233f51b5"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0z"/><path d="M12 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8z"/><circle cx="18.406" cy="5.594" r="1.44"/></svg>');
+    width: 36px;
+    height: 36px;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+.signup-subtitle {
+    color: #666;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+}
+
+/* Input field styling */
+.input-field {
+    margin-bottom: 25px;
+    position: relative;
+}
+
+.input-field input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.input-field input:focus {
+    border-color: #3f51b5;
+    box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.2);
+    outline: none;
+}
+
+.input-field label {
+    position: absolute;
+    top: -10px;
+    left: 10px;
+    background: white;
+    padding: 0 5px;
+    font-size: 0.85rem;
+    color: #666;
+    transition: color 0.3s ease;
+}
+
+.input-field input:focus + label {
+    color: #3f51b5;
+}
+
+/* Error message styling */
+.error-text {
+    color: #f44336;
+    font-size: 0.85rem;
+    text-align: left;
+    margin-top: 5px;
+    display: block;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.input-field.error input {
+    border-color: #f44336;
+}
+
+.input-field.error .error-text {
+    opacity: 1;
+}
+
+/* Improved Profile Picture Upload */
+.profile-upload-container {
+    margin-bottom: 25px;
+    position: relative;
+}
+
+.profile-preview {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 15px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid #3f51b5;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.profile-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-upload .upload-btn {
+    background: linear-gradient(to right, #3f51b5, #5c6bc0);
+    border: none;
+    border-radius: 30px;
+    color: #ffffff;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    height: auto;
+    line-height: normal;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-upload .upload-btn:hover {
+    background: linear-gradient(to right, #354497, #4a57a1);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.35);
+}
+
+.profile-upload input[type=file] {
+    cursor: pointer;
+}
+
+.profile-upload .file-path-wrapper {
+    margin-top: 10px;
+}
+
+.profile-upload .file-path {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px 10px;
+    font-size: 0.9rem;
+    width: 100%;
+}
+
+/* Signup button styling */
+.btn.signup {
+    background: linear-gradient(to right, #3f51b5, #5c6bc0);
+    width: 100%;
+    border: none;
+    border-radius: 30px;
+    padding: 12px 0;
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    margin-top: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    height: auto;
+    line-height: normal;
+}
+
+.btn.signup:hover {
+    background: linear-gradient(to right, #354497, #4a57a1);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.35);
+}
+
+.btn.signup:focus {
+    outline: none;
+}
+
+/* Login link styling */
+.login-link {
+    margin-top: 25px;
+    color: #666;
+    font-size: 0.95rem;
+}
+
+.login-link a {
+    color: #3f51b5;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.login-link a:hover {
+    color: #5c6bc0;
+    text-decoration: underline;
+}
+
+/* Toast notification override */
+#toast-container {
     top: 35px !important;
     right: 25px !important;
     left: auto !important;
+}
+
+/* Responsive styling */
+@media screen and (max-width: 480px) {
+    .signup-container {
+        margin: 40px 15px;
+        padding: 20px 15px;
+    }
+    
+    .signup-logo {
+        font-size: 2.5rem;
+    }
+    
+    .btn.signup {
+        font-size: 1rem;
+        padding: 10px 0;
+    }
+}
+
+/* Force font family to work correctly */
+h2.signup-logo {
+    font-family: 'Grand Hotel', cursive !important;
+}
+
+.signup-logo {
+    font-family: 'Grand Hotel', cursive, 'Roboto', sans-serif;
+    font-size: 3rem;
+    color: #3f51b5;
+    margin-bottom: 10px;
+    display: inline-block;
+}
+
+.signup-logo:before {
+    content: '';
+    display: inline-block;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%233f51b5"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0z"/><path d="M12 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8z"/><circle cx="18.406" cy="5.594" r="1.44"/></svg>');
+    width: 36px;
+    height: 36px;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+.signup-subtitle {
+    color: #666;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+}
+
+/* Input field styling */
+.input-field {
+    margin-bottom: 25px;
+    position: relative;
+}
+
+.input-field input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.input-field input:focus {
+    border-color: #3f51b5;
+    box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.2);
+    outline: none;
+}
+
+.input-field label {
+    position: absolute;
+    top: -10px;
+    left: 10px;
+    background: white;
+    padding: 0 5px;
+    font-size: 0.85rem;
+    color: #666;
+    transition: color 0.3s ease;
+}
+
+.input-field input:focus + label {
+    color: #3f51b5;
+}
+
+/* Error message styling */
+.error-text {
+    color: #f44336;
+    font-size: 0.85rem;
+    text-align: left;
+    margin-top: 5px;
+    display: block;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.input-field.error input {
+    border-color: #f44336;
+}
+
+.input-field.error .error-text {
+    opacity: 1;
+}
+
+/* Signup button styling */
+.btn.signup {
+    background: linear-gradient(to right, #3f51b5, #5c6bc0);
+    width: 100%;
+    border: none;
+    border-radius: 30px;
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    margin-top: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.btn.signup:hover {
+    background: linear-gradient(to right, #354497, #4a57a1);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.35);
+}
+
+.btn.signup:focus {
+    outline: none;
+}
+
+/* Social signup options */
+.social-signup {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.social-signup p {
+    color: #777;
+    margin-bottom: 15px;
+}
+
+.social-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.btn-social {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 15px;
+    border-radius: 4px;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-social:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-social.facebook {
+    background-color: #3b5998;
+}
+
+.btn-social.google {
+    background-color: #db4437;
+}
+
+.btn-social i {
+    margin-right: 8px;
+}
+
+/* Login link styling */
+.login-link {
+    margin-top: 25px;
+    color: #666;
+    font-size: 0.95rem;
+}
+
+.login-link a {
+    color: #3f51b5;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.login-link a:hover {
+    color: #5c6bc0;
+    text-decoration: underline;
+}
+
+/* Password visibility toggle */
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    top: 12px;
+    color: #999;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.password-toggle:hover {
+    color: #3f51b5;
+}
+
+/* Toast notification override - keep the same as your existing one */
+#toast-container {
+    top: 35px !important;
+    right: 25px !important;
+    left: auto !important;
+}
+
+/* Loading state for button */
+.btn.signup.loading {
+    background: linear-gradient(to right, #bbb, #ddd);
+    cursor: not-allowed;
+}
+
+.btn.signup.loading:after {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-left: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Form validation indicators */
+.input-field.valid:after {
+    content: '✓';
+    position: absolute;
+    right: 10px;
+    top: 12px;
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+/* Responsive styling */
+@media screen and (max-width: 480px) {
+    .signup-container {
+        margin: 40px 15px;
+        padding: 20px 15px;
+    }
+    
+    .signup-logo {
+        font-size: 2.5rem;
+    }
+    
+    .social-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .btn-social {
+        width: 100%;
+    }
 }

@@ -1,5 +1,5 @@
-import React, {useState , useEffect} from 'react'
-import {Link , useNavigate} from 'react-router-dom'
+import React, {useState, useEffect} from 'react'
+import {Link, useNavigate} from 'react-router-dom'
 import M from 'materialize-css';
 import './Signup.css'
 const CLOUD_NAME = "dku7k2gnt"; // Replace with your Cloud Name
@@ -12,6 +12,7 @@ function SignUp() {
   const[email, setEmail] = useState("");
   const[password, setPassword] = useState("");
   const[profilePic, setProfilePic] = useState("");
+  const[profilePreview, setProfilePreview] = useState(null);
   const[url, setUrl] = useState("");
 
   useEffect(()=>{ 
@@ -44,6 +45,20 @@ function SignUp() {
     });
   };
   
+  // Add new function to handle file selection with preview
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setProfilePic(file);
+      
+      // Create a preview URL
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfilePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const submitData = ()=>{
     if(!/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(email)){
@@ -89,40 +104,64 @@ function SignUp() {
   }
 
   return (
-    <div className="login-container" >
-      <div className="card login-card .input-field input">
-          <h2>Instagram</h2>
-          <input 
-            type="text" 
-            placeholder='Full-Name'
-            value={fullName}
-            onChange={(event)=>setFullName(event.target.value)}
-           />
-          <input 
-            type="text" 
-            placeholder='email' 
-            value={email}
-            onChange={(event)=>setEmail(event.target.value)}
-          />
-          <input 
-            type="password" 
-            placeholder='password' 
-            value={password}
-            onChange={(event)=>setPassword(event.target.value)}
-          />
-          <div className="file-field input-field">
-            <div className="btn #64b5f6 blue darken-1">
-                <span>Profile Picture</span>
-                <input type="file" onChange={(event)=>setProfilePic(event.target.files[0])}/>
-            </div>
-            <div className="file-path-wrapper">
-                <input className="file-path validate" type="text" />
-            </div>
+    <div className="signup-container">
+      <div className="signup-header">
+        <h2 className="signup-logo">Instagram</h2>
+        <p className="signup-subtitle">Sign up to see photos and videos from your friends.</p>
+      </div>
+      <div className="input-field">
+        <input 
+          type="text" 
+          id="fullName"
+          value={fullName}
+          onChange={(event) => setFullName(event.target.value)}
+        />
+        <label htmlFor="fullName" className={fullName ? "active" : ""}>Full Name</label>
+      </div>
+      <div className="input-field">
+        <input 
+          type="text" 
+          id="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+        />
+        <label htmlFor="email" className={email ? "active" : ""}>Email</label>
+      </div>
+      <div className="input-field">
+        <input 
+          type="password" 
+          id="password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+        />
+        <label htmlFor="password" className={password ? "active" : ""}>Password</label>
+      </div>
+      
+      {/* Updated profile picture section */}
+      <div className="profile-upload-container">
+        {profilePreview && (
+          <div className="profile-preview">
+            <img src={profilePreview} alt="Profile Preview" />
+          </div>
+        )}
+        <div className="file-field input-field profile-upload">
+          <div className="btn upload-btn">
+            <span>{profilePreview ? "Change Profile Picture" : "Upload Profile Picture"}</span>
+            <input 
+              type="file" 
+              onChange={handleFileChange}
+              accept="image/*"
+            />
+          </div>
+          <div className="file-path-wrapper">
+            <input className="file-path validate" type="text" placeholder="Upload your profile picture" />
+          </div>
         </div>
-          <button onClick={() => register()} className="btn waves-effect waves-light btn-large #64b5f6 blue darken-1">SignUp</button>
-          <h6>
-            <Link to="/login">Already have an account?</Link>
-          </h6>
+      </div>
+      
+      <button onClick={() => register()} className="btn signup">Sign Up</button>
+      <div className="login-link">
+        <p>Already have an account? <Link to="/login">Log In</Link></p>
       </div>
     </div>
   )
