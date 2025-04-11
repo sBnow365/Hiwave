@@ -115,7 +115,7 @@ function Profile() {
         <div>
           <img
             style={{ width: "166px", height: "166px", borderRadius: "83px" }}
-            src={profileUser.profilePicUrl || "https://m.media-amazon.com/images/M/MV5BODk3OWIyY2MtM2E0MS00OWYyLTlkNDktMzY4MTE1MDhiYzBiXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg"}
+            src={profileUser.profilePicUrl || "https://cdn-icons-png.flaticon.com/128/1946/1946429.png"}
             alt="Profile"
           />
         </div>

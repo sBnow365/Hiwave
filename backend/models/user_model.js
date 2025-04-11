@@ -15,8 +15,7 @@ const userSchema = new mongoose.Schema({
     },
     profilePicUrl: {
         type: String,
-        default: "https://m.media-amazon.com/images/M/MV5BODk3OWIyY2MtM2E0MS00OWYyLTlkNDktMzY4MTE1MDhiYzBiXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg", // Default profile image
-        required:true
+        default: "https://cdn-icons-png.flaticon.com/128/1946/1946429.png", // Default profile image
     },
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "UserModel" }], // Correct ObjectId reference
     following: [{ type: mongoose.Schema.Types.ObjectId, ref: "UserModel" }]  // Correct ObjectId reference

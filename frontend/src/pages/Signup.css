@@ -1,4 +1,6 @@
 /* Signup.css - Custom styling for the Instagram clone signup page */
+/* Import the Grand Hotel font if not imported globally */
+@import url('https://fonts.googleapis.com/css2?family=Grand+Hotel&display=swap');
 
 /* Container for the signup form */
 .signup-container {
@@ -16,8 +18,6 @@
     margin-bottom: 30px;
 }/* Signup.css - Custom styling for the Instagram clone signup page */
 
-/* Import the Grand Hotel font if not imported globally */
-@import url('https://fonts.googleapis.com/css2?family=Grand+Hotel&display=swap');
 
 /* Container for the signup form */
 .signup-container {
