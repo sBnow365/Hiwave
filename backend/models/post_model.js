@@ -1,37 +1,40 @@
-const mongoose=require('mongoose')// to import the modules
-//id of user needs to be connected to post model
+const mongoose = require('mongoose');
+const { ObjectId } = mongoose.Schema.Types;
 
-const {ObjectId}=mongoose.Schema.Types;
-
-const postSchema=new mongoose.Schema({
-    title:{
-        type:String,
-        required:true
+const postSchema = new mongoose.Schema({
+    title: {
+        type: String,
+        required: true
     },
-    body:{
-        type:String,
-        required:true
+    body: {
+        type: String,
+        required: true
     },
-    likes:[
+    likes: [
         {
-            type:ObjectId,
-            ref:"UserModel"
+            type: ObjectId,
+            ref: "UserModel"
         }
     ],
-    comments:[
+    comments: [
         {
-            commentText:String,
-            commentedBy:{ type :ObjectId, ref:"UserModel"}//link to user object
+            commentText: String,
+            commentedBy: { type: ObjectId, ref: "UserModel" }
         }
     ],
-    image:{
-        type:String,
-        required:true
+    mediaUrl: {
+        type: String,
+        required: true
     },
-    author:{
-        type:ObjectId,
-        ref:"UserModel"
+    mediaType: {
+        type: String,
+        enum: ['image', 'video'],
+        required: true
+    },
+    author: {
+        type: ObjectId,
+        ref: "UserModel"
     }
+});
 
-})
-mongoose.model("PostModel",postSchema);
+mongoose.model("PostModel", postSchema);

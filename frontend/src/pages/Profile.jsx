@@ -97,6 +97,32 @@ function Profile() {
     }
   };
 
+  // Helper function to render media based on type
+  const renderMedia = (post) => {
+    if (post.mediaType === 'video') {
+      return (
+        <video 
+          className="post" 
+          controls
+          key={post._id}
+        >
+          <source src={post.mediaUrl} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      );
+    } else {
+      // Default to image
+      return (
+        <img 
+          className="post" 
+          src={post.mediaUrl} 
+          alt={post.title} 
+          key={post._id} 
+        />
+      );
+    }
+  };
+
   if (loading) {
     return <div className="loading">Loading profile...</div>;
   }
@@ -144,14 +170,7 @@ function Profile() {
 
       <div className="posts">
         {myposts.length > 0 ? (
-          myposts.map((post) => (
-            <img 
-              className="post" 
-              src={post.image} 
-              alt={post.title} 
-              key={post._id} 
-            />
-          ))
+          myposts.map((post) => renderMedia(post))
         ) : (
           <h4>No Posts Yet</h4>
         )}

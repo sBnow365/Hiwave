@@ -44,24 +44,36 @@ router.get('/myposts',protectedResource,(req,res)=>{
         console.log(error);
     });
 });
-router.post('/createpost',protectedResource,(req,res)=>{
-    const {title,body,image}=req.body;
-    if(!title || !body || !image){
-        return res.status(400).json({error:"one or more required fields are empty"});//i dont want to continue furthur after encountering this error
+router.post('/createpost', protectedResource, (req, res) => {
+    const { title, body, mediaUrl, mediaType } = req.body;
+    
+    if (!title || !body || !mediaUrl || !mediaType) {
+      return res.status(400).json({ error: "One or more required fields are empty" });
     }
-     //console.log(req.dbUser);
-      //res.send("Done");
-      req.dbUser.password=undefined//should not send the password
-    const post=new PostModel({title:title,body:body,image:image ,author:req.dbUser})//make post object
-
-    post.save()
-    .then((dbPost)=>{
-        res.status(201).json({post:dbPost})
-    })
-    .catch((error)=>{
-        console.log(error);
+    
+    if (!["image", "video"].includes(mediaType)) {
+      return res.status(400).json({ error: "Invalid media type. Must be 'image' or 'video'" });
+    }
+    
+    req.dbUser.password = undefined; // should not send the password
+    
+    const post = new PostModel({
+      title: title,
+      body: body,
+      mediaUrl: mediaUrl,
+      mediaType: mediaType,
+      author: req.dbUser
     });
-});
+    
+    post.save()
+      .then((dbPost) => {
+        res.status(201).json({ post: dbPost });
+      })
+      .catch((error) => {
+        console.log(error);
+        res.status(500).json({ error: "Failed to create post" });
+      });
+  });
 //implementing like endpoint
 router.put('/like', protectedResource, (req, res) => {
     PostModel.findByIdAndUpdate(
