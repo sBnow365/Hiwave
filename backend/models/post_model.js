@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const { ObjectId } = mongoose.Schema.Types;
 
 const postSchema = new mongoose.Schema({
     title: {
@@ -10,31 +9,48 @@ const postSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    likes: [
-        {
-            type: ObjectId,
-            ref: "UserModel"
-        }
-    ],
-    comments: [
-        {
-            commentText: String,
-            commentedBy: { type: ObjectId, ref: "UserModel" }
-        }
-    ],
     mediaUrl: {
-        type: String,
-        required: true
+        type: String
     },
     mediaType: {
         type: String,
-        enum: ['image', 'video'],
-        required: true
+        enum: ["image", "video"]
     },
+    // Poll schema
+    poll: {
+        options: [{
+            text: { 
+                type: String, 
+                required: true 
+            },
+            votes: [{ 
+                type: mongoose.Schema.Types.ObjectId, 
+                ref: 'UserModel' 
+            }]
+        }],
+        expiresAt: { 
+            type: Date 
+        },
+        totalVotes: { 
+            type: Number, 
+            default: 0 
+        }
+    },
+    likes: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "UserModel"
+    }],
+    comments: [{
+        commentText: String,
+        commentedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "UserModel"
+        }
+    }],
     author: {
-        type: ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "UserModel"
     }
-});
+}, { timestamps: true });
 
 mongoose.model("PostModel", postSchema);
