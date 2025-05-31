@@ -11,7 +11,6 @@ function OtherUserProfile() {
   const { state, dispatch } = useContext(UserContext);  
 
   useEffect(() => {
-    
     if (!userId) {
       M.toast({ html: "User ID not found!", classes: "red darken-3" });
       return;
@@ -29,13 +28,7 @@ function OtherUserProfile() {
       .then(response => response.json())
       .then(data => {
         console.log("Full API Response:", data);
-        if (data && data.user) {
-          console.log("User Info:", data.user);
-          setUserData(data.user);
-        } else {
-          console.log("No user data received");
-          setUserData({});
-        }
+        setUserData(data.user || {});
         setMyPosts(data.posts || []);
       })
       .catch(error => {
@@ -44,130 +37,146 @@ function OtherUserProfile() {
       });
   }, [userId]);
 
-  // Update isFollowing based on userData and logged-in user state
   useEffect(() => {
     if (userData && state) {
-      // Check if logged-in user's id is in the followers list of the profile user
       setIsFollowing(userData.followers?.includes(state._id));
     }
   }, [userData, state]);
 
   const follow = () => {
     fetch('/api/follow', {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-        body: JSON.stringify({ followId: userId }),
-    })
-    .then(async (response) => {
-        const result = await response.json();
-        console.log("Follow API Response:", result);  // ✅ Check the response
-        if (!response.ok) {
-            throw new Error(result.error || "Failed to follow user");
-        }
-        return result;
-    })
-    .then((updatedUser) => {
-        console.log("Updated User:", updatedUser);
-        dispatch({ type: "UPDATE", payload: { followers: updatedUser.followers } });
-        localStorage.setItem("user", JSON.stringify(updatedUser));
-        setUserData((prevData) => ({
-            ...prevData,
-            followers: [...(prevData.followers || []), state._id],
-        }));
-
-        M.toast({ html: "Followed successfully!", classes: "green darken-2" });
-    })
-    .catch((error) => {
-        console.error("Error following user:", error);
-        M.toast({ html: "Something went wrong!", classes: "red darken-3" });
-    });
-};
-
-
-const unfollow = () => {
-  fetch('/api/unfollow', {
       method: "PUT",
       headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + localStorage.getItem("token"),
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+      body: JSON.stringify({ followId: userId }),
+    })
+      .then(res => res.json())
+      .then(updatedUser => {
+        dispatch({ type: "UPDATE", payload: { followers: updatedUser.followers } });
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+        setUserData(prev => ({
+          ...prev,
+          followers: [...(prev.followers || []), state._id],
+        }));
+        M.toast({ html: "Followed successfully!", classes: "green darken-2" });
+      })
+      .catch(err => {
+        console.error(err);
+        M.toast({ html: "Something went wrong!", classes: "red darken-3" });
+      });
+  };
+
+  const unfollow = () => {
+    fetch('/api/unfollow', {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
       },
       body: JSON.stringify({ unfollowId: userId }),
-  })
-  .then(async (response) => {
-      const result = await response.json();
-      console.log("Unfollow API Response:", result);  // ✅ Check API response
-      if (!response.ok) {
-          throw new Error(result.error || "Failed to unfollow user");
-      }
-      return result;
-  })
-  .then((updatedUser) => {
-      console.log("Updated User After Unfollow:", updatedUser);
-      dispatch({ type: "UPDATE", payload: { followers: updatedUser.followers } });
-      localStorage.setItem("user", JSON.stringify(updatedUser));
+    })
+      .then(res => res.json())
+      .then(updatedUser => {
+        dispatch({ type: "UPDATE", payload: { followers: updatedUser.followers } });
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+        setUserData(prev => ({
+          ...prev,
+          followers: (prev.followers || []).filter(id => id !== state._id),
+        }));
+        M.toast({ html: "Unfollowed successfully!", classes: "blue darken-3" });
+      })
+      .catch(err => {
+        console.error(err);
+        M.toast({ html: "Something went wrong!", classes: "red darken-3" });
+      });
+  };
 
-      setUserData((prevData) => ({
-          ...prevData,
-          followers: (prevData.followers || []).filter(id => id !== state._id),
-      }));
-
-      M.toast({ html: "Unfollowed successfully!", classes: "blue darken-3" });
-  })
-  .catch((error) => {
-      console.error("Error unfollowing user:", error);
-      M.toast({ html: "Something went wrong!", classes: "red darken-3" });
-  });
-};
-
-
-  return (
-    <div className='main-container'>
-      <div className='profile-container'>
-        <div>
-          {/* Display the profile picture */}
-          <img 
-            style={{ width: "166px", height: "166px", borderRadius: "83px" }} 
-            src='https://images.unsplash.com/photo-1504593811423-6dd665756598?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-            alt="Profile"
-          />
-        </div>
-        <div className='details-section'>
-          <h4>{userData?.fullName || "No name available"}</h4>
-          <h5>{userData?.email || "No email available"}</h5>
-          <div className='followings'>
-            <h6>{myposts.length} posts</h6>
-            <h6>{userData?.followers?.length || 0} followers</h6>
-            <h6>{userData?.following?.length || 0} following</h6>
-          </div>
-          {/* Render the follow/unfollow button only if userData is loaded, and the logged-in user is not viewing their own profile */}
-          <button 
-    onClick={userData?.followers?.includes(state._id) ? unfollow : follow} 
-    className={`btn waves-effect waves-light ${userData?.followers?.includes(state._id) ? "red darken-3" : "blue darken-4"}`}
->
-    {userData?.followers?.includes(state._id) ? "Unfollow" : "Follow"}
-</button>
-
-        </div>
+ return (
+  <div className='main-container'>
+    <div className='profile-container'>
+      <div>
+        <img 
+          style={{ width: "166px", height: "166px", borderRadius: "83px" }}
+          src={userData?.profilePicUrl || '/default-profile.jpg'} 
+          alt="Profile"
+        />
       </div>
-      <div className='posts'>
-        {myposts.length > 0 ? (
-          myposts.map((post) => (
-            <img 
-              className='post' 
-              src={post.image} 
-              alt={post.title || "Post"} 
-              key={post._id} 
-            />
-          ))
-        ) : (
-          <p>No posts available</p>
+      <div className='details-section'>
+        <h4>{userData?.fullName || "No name available"}</h4>
+        <h5>{userData?.email || "No email available"}</h5>
+        <div className='followings'>
+          <h6>{myposts.length} posts</h6>
+          <h6>{userData?.followers?.length || 0} followers</h6>
+          <h6>{userData?.following?.length || 0} following</h6>
+        </div>
+        {state?._id !== userId && (
+          <button
+            onClick={isFollowing ? unfollow : follow}
+            className={`btn waves-effect waves-light ${isFollowing ? "red darken-3" : "blue darken-4"}`}
+          >
+            {isFollowing ? "Unfollow" : "Follow"}
+          </button>
         )}
       </div>
     </div>
-  );
-}
 
+    <div className='posts'>
+      {myposts.length > 0 ? (
+        myposts.map(post => (
+          <div key={post._id} className="post-item">
+{post.mediaType === "video" ? (
+  <video
+    controls
+    style={{
+      width: "100%",
+      maxHeight: "350px",
+      borderRadius: "10px",
+      objectFit: "cover"
+    }}
+  >
+    <source src={post.mediaUrl} type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+) : (
+  <img
+    src={post.mediaUrl || post.image}
+    alt={post.title || "Post"}
+    style={{
+      width: "100%",
+      maxHeight: "350px",
+      borderRadius: "10px",
+      objectFit: "cover"
+    }}
+  />
+)}
+
+
+            <h6>{post.title}</h6>
+
+            {post.poll && Array.isArray(post.poll.options) && post.poll.options.length > 0 && (
+              <div className="poll-section">
+                <strong>Poll:</strong>
+                {post.poll.options.map((opt, i) => (
+                  <div key={i} className="poll-option">
+                    <input 
+                      type="radio" 
+                      name={`poll-${post._id}`} 
+                      id={`option-${post._id}-${i}`} 
+                    />
+                    <label htmlFor={`option-${post._id}-${i}`}>{opt.option}</label>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ))
+      ) : (
+        <p>No posts available</p>
+      )}
+    </div>
+  </div>
+);
+}
 export default OtherUserProfile;

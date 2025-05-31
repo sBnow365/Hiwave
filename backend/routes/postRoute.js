@@ -429,6 +429,26 @@ router.delete("/deletecomment/:postId/:commentId", protectedResource, (req, res)
             res.status(500).json({ error: "Internal server error" });
         });
 });
+// router.put('/updateprofilepic', protectedResource, (req, res) => {
+//     const { profilePicUrl } = req.body;
+
+//     if (!profilePicUrl) {
+//         return res.status(400).json({ error: "Profile picture URL is required" });
+//     }
+
+//     UserModel.findByIdAndUpdate(
+//         req.dbUser._id,
+//         { profilePicUrl: profilePicUrl },
+//         { new: true }
+//     )
+//     .then((updatedUser) => {
+//         res.json({ user: updatedUser });
+//     })
+//     .catch((error) => {
+//         console.error("Error updating profile pic:", error);
+//         res.status(500).json({ error: "Internal server error" });
+//     });
+// });
 
 
 
