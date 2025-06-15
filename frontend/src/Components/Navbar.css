@@ -16,27 +16,48 @@ nav .nav-wrapper {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    height: 100%;
 }
 
+/* Brand logo container - improved for side-by-side layout */
 .brand-logo {
-    font-family: 'Grand Hotel', cursive, 'Roboto', sans-serif ;
+    font-family: 'Grand Hotel', cursive, 'Roboto', sans-serif;
     font-size: 2.2rem !important;
     color: white !important;
     letter-spacing: 1px;
     position: relative !important;
     left: 0 !important;
     transform: none !important;
-    display: flex;
-    align-items: center;
+    display: flex !important;
+    align-items: center !important;
+    text-decoration: none;
+    height: 100%;
+    line-height: normal;
 }
 
-.brand-logo:before {
-    content: '';
-    display: inline-block;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0z"/><path d="M12 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8z"/><circle cx="18.406" cy="5.594" r="1.44"/></svg>');
-    width: 24px;
-    height: 24px;
-    margin-right: 8px;
+/* Brand image styling - REDUCED SIZE */
+.brand-img1 {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    margin-right: 10px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    transition: transform 0.2s ease;
+}
+
+.brand-logo:hover .brand-img {
+    transform: scale(1.05);
+}
+
+/* Brand text styling */
+.brand-text {
+    font-size: 2.2rem;
+    font-weight: 400;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    margin: 0;
+    line-height: 1;
 }
 
 /* Nav links styling */
@@ -44,11 +65,15 @@ nav ul {
     display: flex;
     align-items: center;
     gap: 10px;
+    margin: 0;
+    height: 100%;
 }
 
 nav ul li {
     margin: 0 5px;
     transition: transform 0.2s ease;
+    display: flex;
+    align-items: center;
 }
 
 nav ul li:hover {
@@ -58,11 +83,16 @@ nav ul li:hover {
 nav ul li a {
     color: white !important;
     font-weight: 500;
-    padding: 0 15px;
+    padding: 8px 15px;
     border-radius: 20px;
     transition: background-color 0.2s ease;
     text-transform: capitalize;
     letter-spacing: 0.5px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    height: auto;
+    line-height: normal;
 }
 
 nav ul li a:hover {
@@ -74,43 +104,49 @@ nav ul li a.active {
     background-color: rgba(255, 255, 255, 0.2);
 }
 
-/* New Logout button styling */
+/* Logout button styling */
 nav .btn.logout {
-  background: linear-gradient(45deg, #4a90e2, #357ab7) !important;
-  border: none;
-  border-radius: 30px;
-  padding: 10px 20px;
-  color: #ffffff !important;
-  font-size: 1rem;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
-  transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    background: linear-gradient(45deg, #4a90e2, #357ab7) !important;
+    border: none;
+    border-radius: 30px;
+    padding: 8px 20px;
+    color: #ffffff !important;
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    height: auto;
+    line-height: normal;
+    text-transform: capitalize;
 }
 
 nav .btn.logout:hover {
-  background: linear-gradient(45deg, #357ab7, #4a90e2) !important;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.35);
+    background: linear-gradient(45deg, #357ab7, #4a90e2) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.35);
 }
 
 nav .btn.logout:focus {
-  outline: none;
-  background: linear-gradient(45deg, #357ab7, #4a90e2) !important;
+    outline: none;
+    background: linear-gradient(45deg, #357ab7, #4a90e2) !important;
 }
 
 /* Override button styling for any other buttons in navbar */
 nav .btn {
-    height: 36px;
-    line-height: 36px;
-    padding: 0 16px;
+    height: auto;
+    line-height: normal;
+    padding: 8px 16px;
     border-radius: 20px;
-    background-color: rgb(225,9,20) !important;
+    background-color: rgb(225, 9, 20) !important;
     text-transform: capitalize;
     font-weight: 500;
     letter-spacing: 0.5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+    color: white;
 }
 
 nav .btn:hover {
@@ -126,24 +162,49 @@ nav .btn:focus {
 /* Mobile responsiveness */
 @media screen and (max-width: 768px) {
     nav .nav-wrapper {
-      padding: 0 10px;
+        padding: 0 10px;
     }
     
     .brand-logo {
-      font-size: 1.8rem !important;
+        font-size: 1.8rem !important;
+    }
+    
+    .brand-text {
+        font-size: 1.8rem;
+    }
+    
+    .brand-img {
+        width: 24px;
+        height: 24px;
+        margin-right: 8px;
     }
     
     nav ul li a {
-      padding: 0 8px;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+    }
+    
+    nav .btn {
+        padding: 6px 12px;
+        font-size: 0.9rem;
     }
 }
 
-/* Add a subtle indicator for dropdown menus */
-nav ul li.has-dropdown > a:after {
-    content: '▼';
-    font-size: 0.6rem;
-    margin-left: 5px;
-    vertical-align: middle;
+@media screen and (max-width: 480px) {
+    .brand-text {
+        font-size: 1.5rem;
+    }
+    
+    .brand-img {
+        width: 20px;
+        height: 20px;
+        margin-right: 6px;
+    }
+    
+    nav ul li a {
+        padding: 5px 10px;
+        font-size: 0.8rem;
+    }
 }
 
 /* User avatar styling for profile link */
@@ -159,6 +220,7 @@ nav ul li a.profile-link:before {
     width: 18px;
     height: 18px;
     margin-right: 5px;
+    flex-shrink: 0;
 }
 
 /* Create post icon */
@@ -169,6 +231,7 @@ nav ul li a.create-post-link:before {
     width: 18px;
     height: 18px;
     margin-right: 5px;
+    flex-shrink: 0;
 }
 
 /* Following posts icon */
@@ -179,4 +242,5 @@ nav ul li a.following-link:before {
     width: 18px;
     height: 18px;
     margin-right: 5px;
+    flex-shrink: 0;
 }

@@ -3,6 +3,7 @@ import { Link, useNavigate} from 'react-router-dom'
 import M from 'materialize-css';
 import { UserContext } from '../App';
 import './Login.css'  // Import the new CSS file
+import brandLogo from '../assets/brand.jpeg';
 
 function Login() {
   const {state, dispatch} = useContext(UserContext);
@@ -55,7 +56,8 @@ function Login() {
   return (
     <div className="login-container">
       <div className="login-card">
-        <h2>Instagram</h2>
+        <img src={brandLogo} alt="Logo" className="brand-img" />
+        <h2>Flick-it</h2>
         
         <input 
           type="text" 

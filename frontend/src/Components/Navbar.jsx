@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import './Navbar.css';
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { UserContext } from "../App";
+import brandLogo from '../assets/brand.jpeg';
 
 const Navbar = () => {
   const { state, dispatch } = useContext(UserContext);
@@ -57,9 +58,10 @@ const Navbar = () => {
   return (
     <nav>
       <div className="nav-wrapper">
-        <Link to={state ? "/" : "/login"} className="brand-logo">
-          Instagram
-        </Link>
+        <Link to="/" className="brand-logo">
+  <img src={brandLogo} alt="Logo" className="brand-img1" />
+  <span className="brand-text">Flick-it</span>
+</Link>
         <ul id="nav-mobile" className="right">
           {navList()}
         </ul>

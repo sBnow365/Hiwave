@@ -2,9 +2,10 @@ import React, {useState, useEffect} from 'react'
 import {Link, useNavigate} from 'react-router-dom'
 import M from 'materialize-css';
 import './Signup.css'
+import brandLogo from '../assets/brand.jpeg';  // Import your brand logo
+
 const CLOUD_NAME = "dku7k2gnt"; // Replace with your Cloud Name
 const UPLOAD_PRESET = "dynamicduo"; // Ensure you have this from Cloudinary
-
 
 function SignUp() {
   const navigate = useNavigate();
@@ -106,7 +107,8 @@ function SignUp() {
   return (
     <div className="signup-container">
       <div className="signup-header">
-        <h2 className="signup-logo">Instagram</h2>
+        <img src={brandLogo} alt="Logo" className="signup-brand-img" />
+        <h2 className="signup-logo">Flick-it</h2>
         <p className="signup-subtitle">Sign up to see photos and videos from your friends.</p>
       </div>
       <div className="input-field">
