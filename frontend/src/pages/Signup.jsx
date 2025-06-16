@@ -108,7 +108,7 @@ function SignUp() {
     <div className="signup-container">
       <div className="signup-header">
         <img src={brandLogo} alt="Logo" className="signup-brand-img" />
-        <h2 className="signup-logo">Flick-it</h2>
+        <h2 className="signup-logo">Hi Wave</h2>
         <p className="signup-subtitle">Sign up to see photos and videos from your friends.</p>
       </div>
       <div className="input-field">

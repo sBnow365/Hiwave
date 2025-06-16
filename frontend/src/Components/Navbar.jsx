@@ -60,7 +60,7 @@ const Navbar = () => {
       <div className="nav-wrapper">
         <Link to="/" className="brand-logo">
   <img src={brandLogo} alt="Logo" className="brand-img1" />
-  <span className="brand-text">Flick-it</span>
+  <span className="brand-text">HiWave</span>
 </Link>
         <ul id="nav-mobile" className="right">
           {navList()}

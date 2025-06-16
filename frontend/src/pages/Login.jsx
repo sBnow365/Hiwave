@@ -57,7 +57,7 @@ function Login() {
     <div className="login-container">
       <div className="login-card">
         <img src={brandLogo} alt="Logo" className="brand-img" />
-        <h2>Flick-it</h2>
+        <h2>Hi Wave</h2>
         
         <input 
           type="text" 
