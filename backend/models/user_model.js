@@ -17,8 +17,14 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: "https://cdn-icons-png.flaticon.com/128/1946/1946429.png", // Default profile image
     },
-    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "UserModel" }], // Correct ObjectId reference
-    following: [{ type: mongoose.Schema.Types.ObjectId, ref: "UserModel" }]  // Correct ObjectId reference
+    followers: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "UserModel"
+    }], // Correct ObjectId reference
+    following: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "UserModel"
+    }]  // Correct ObjectId reference
 });
 
 // Export the model (this should come after defining schema)

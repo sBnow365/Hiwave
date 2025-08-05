@@ -304,10 +304,10 @@ router.put('/like', protectedResource, (req, res) => {
         { new: true } // Return updated document
     )
     .populate("author", "_id fullName")
-    .then((result) => {  // ✅ Fix: 'result' is the first argument
+    .then((result) => {  //  Fix: 'result' is the first argument
         res.json(result);
     })
-    .catch((error) => {  // ✅ Fix: Handle errors properly
+    .catch((error) => {  // Fix: Handle errors properly
         console.error("Error in like API:", error);
         res.status(400).json({ error: error.message });
     });
@@ -429,27 +429,6 @@ router.delete("/deletecomment/:postId/:commentId", protectedResource, (req, res)
             res.status(500).json({ error: "Internal server error" });
         });
 });
-// router.put('/updateprofilepic', protectedResource, (req, res) => {
-//     const { profilePicUrl } = req.body;
-
-//     if (!profilePicUrl) {
-//         return res.status(400).json({ error: "Profile picture URL is required" });
-//     }
-
-//     UserModel.findByIdAndUpdate(
-//         req.dbUser._id,
-//         { profilePicUrl: profilePicUrl },
-//         { new: true }
-//     )
-//     .then((updatedUser) => {
-//         res.json({ user: updatedUser });
-//     })
-//     .catch((error) => {
-//         console.error("Error updating profile pic:", error);
-//         res.status(500).json({ error: "Internal server error" });
-//     });
-// });
-
 
 
 module.exports=router;

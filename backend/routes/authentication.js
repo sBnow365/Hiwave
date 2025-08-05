@@ -14,7 +14,7 @@ const protectedResource = require('../middleware/protectedResource');
 
 
 router.get('/',(req,res)=>{
-    res.send("Hello from sashwat");
+    res.send("Hello from someone");
 });
 
 router.get('/secured',protectedResource,(req,res)=>{
