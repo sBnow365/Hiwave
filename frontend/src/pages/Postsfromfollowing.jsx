@@ -172,7 +172,7 @@ function Postsfromfollowing() {//home page
                     <img  src={post.image} alt="" />
                 </div>
                 <div className='card-content'>
-                  <i className="material-icons" style={{color:"red" , marginRight: "10px"}}>favorite</i>
+                  {/* <i className="material-icons" style={{color:"red" , marginRight: "10px"}}>favorite</i> */}
                   {
                     post.likes.includes(state._id)
                     ?<i onClick={()=>likeUnlike(post._id , '/unlike')} className="material-icons" style={{color:"red" , cursor: "pointer"}}>thumb_down</i>

@@ -262,7 +262,7 @@ function Home() {
 
             <div className='card-content'>
               {/* Like/Unlike section */}
-              <i className="material-icons" style={{ color: "red", marginRight: "10px" }}>favorite</i>
+              {/* <i className="material-icons" style={{ color: "red", marginRight: "10px" }}>favorite</i> */}
               {post.likes.includes(state?._id)
                 ? <i onClick={() => likeUnlike(post._id, '/unlike')} className="material-icons" style={{ color: "red", cursor: "pointer" }}>thumb_down</i>
                 : <i onClick={() => likeUnlike(post._id, '/like')} className="material-icons" style={{ color: "blue", marginRight: "10px", cursor: "pointer" }}>thumb_up</i>
