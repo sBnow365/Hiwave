@@ -1,14 +1,12 @@
 {
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "https://hiwave.onrender.com/$1"
-    }
-  ],
-  "routes": [
+      "source": "/api/:match*",
+      "destination": "https://hiwave.onrender.com/:match*"
+    },
     {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/:path*",
+      "destination": "/index.html"
     }
   ]
 }
