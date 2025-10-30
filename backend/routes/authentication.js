@@ -65,7 +65,7 @@ router.post('/register',(req,res)=>{
             //error message
             res.status(500).json({error:"User with email already exists"});
         }
-        bcrypt.hash(password,6)//high alue higher encryption
+        bcrypt.hash(password,10)//high alue higher encryption
         .then((hashedPassword)=>{
             
             const user=new UserModel({fullName,email,password:hashedPassword,profilePicUrl:profilePic})//var names should be same
