@@ -14,22 +14,22 @@ router.get('/user/:userId', protectedResource, async (req, res) => {
         const { userId } = req.params;
         console.log('Fetching user with userId:', userId);
 
-        // ✅ Validate if userId is a valid MongoDB ObjectId
+        // Validate if userId is a valid MongoDB ObjectId
         if (!mongoose.isValidObjectId(userId)) {
             return res.status(400).json({ error: 'Invalid user ID format' });
         }
 
-        // ✅ Find user and exclude password
+        // Find user and exclude password
         const userFound = await UserModel.findById(userId).select('-password');
         if (!userFound) {
             console.log('User not found');
             return res.status(404).json({ error: 'User not found' });
         }
 
-        // ✅ Find posts by user with populate (latest Mongoose syntax)
+        // Find posts by user with populate (latest Mongoose syntax)
         const posts = await PostModel.find({ author: userId }).populate('author', '_id fullName');
 
-        // ✅ Send structured response
+        // Send structured response
         res.status(200).json({ user: userFound, posts });
 
     } catch (err) {
