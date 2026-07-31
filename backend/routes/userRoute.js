@@ -26,7 +26,7 @@ router.get('/user/:userId', protectedResource, async (req, res) => {
             return res.status(404).json({ error: 'User not found' });
         }
 
-        // Find posts by user with populate (latest Mongoose syntax)
+        // Find posts by user with populate 
         const posts = await PostModel.find({ author: userId }).populate('author', '_id fullName');
 
         // Send structured response
