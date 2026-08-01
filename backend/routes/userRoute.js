@@ -28,7 +28,13 @@ router.get('/user/:userId', protectedResource, async (req, res) => {
 
         // Find posts by user with populate 
         const posts = await PostModel.find({ author: userId }).populate('author', '_id fullName');
-
+        
+        //populate() is Mongoose's way of performing an application-level join. 
+        // It first fetches the documents containing referenced ObjectIds, 
+        // then issues another query to the referenced collection (using the ref field) 
+        // and replaces those ObjectIds with the corresponding documents, 
+        // optionally selecting only specific fields like _id and fullName
+        
         // Send structured response
         res.status(200).json({ user: userFound, posts });
 
@@ -56,8 +62,8 @@ router.put('/follow', protectedResource, async (req, res) => {
         // Add the followed user to the logged-in user's following list
         const updatedUser = await UserModel.findByIdAndUpdate(
             req.dbUser.id,
-            { $push: { following: followId } },
-            { new: true }
+            { $push: { following: followId } },// without $ it would replace all values with just this
+            { new: true }// return the updated document
         ).select('-password');
 
         res.json(updatedUser);
