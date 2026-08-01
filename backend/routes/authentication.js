@@ -22,33 +22,45 @@ router.get('/secured',protectedResource,(req,res)=>{
 });
 
 
-router.post('/login', (req, res) => {
-    const { email, password } = req.body; // Destructuring
-    if (!email || !password) {
-        return res.status(400).json({ error: "One or more required fields are empty" });
-    }
+router.post('/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
 
-    UserModel.findOne({ email: email })
-        .then((dbUser) => {
-            if (!dbUser) {
-                return res.status(400).json({ error: "User not found" });
+        if (!email || !password) {
+            return res.status(400).json({error: "One or more required fields are empty"});
+        }
+
+        const dbUser = await UserModel.findOne({ email });
+
+        if (!dbUser) {
+            return res.status(400).json({error: "User not found"});
+        }
+
+        const didMatch = await bcrypt.compare(password,dbUser.password);
+
+        if (!didMatch) {
+            return res.status(400).json({error: "Invalid Credentials"});
+        }
+
+        const jwtToken = jwt.sign(
+            { _id: dbUser._id },
+            JWT_SECRET
+        );
+
+        const {_id,fullName,followers,following,profilePicUrl} = dbUser;
+
+        return res.json({
+            token: jwtToken,
+            userInfo: {_id,fullName,email,followers,following,profilePicUrl
             }
-
-            return bcrypt.compare(password, dbUser.password)
-                .then((didMatch) => {
-                    if (didMatch) {
-                        const jwtToken = jwt.sign({ _id: dbUser._id }, JWT_SECRET);
-                        const { _id, fullName, email, followers, following, profilePicUrl } = dbUser;
-                        return res.json({ token: jwtToken, userInfo: { _id, fullName, email, followers, following, profilePicUrl } });
-                    } else {
-                        return res.status(400).json({ error: "Invalid Credentials" });
-                    }
-                });
-        })
-        .catch((error) => {
-            console.error("Error during login:", error);
-            return res.status(500).json({ error: "Internal Server Error" });
         });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            error: "Internal Server Error"
+        });
+    }
 });
 
 router.post('/register',(req,res)=>{
