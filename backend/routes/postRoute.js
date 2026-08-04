@@ -8,7 +8,7 @@ const PostModel=mongoose.model("PostModel");
 router.get('/posts', protectedResource, async (req, res) => {
     try {
         const dbPosts = await PostModel.find()
-            .populate("author", "_id fullName profilePicUrl")
+            .populate("author", "_id fullName profilePicUrl")//replacing object refrences with actual docs
             .populate("comments.commentedBy", "_id fullName profilePicUrl");
 
         res.status(200).json({ posts: dbPosts });
@@ -49,131 +49,136 @@ router.get('/myposts', protectedResource, async (req, res) => {
     }
 });
 
+router.post('/createpost', protectedResource, async (req, res) => {
+    try {
+        const { title,body,mediaUrl,mediaType,pollOptions,pollExpiresAt} = req.body;
 
-router.post('/createpost', protectedResource, (req, res) => {
-    const { title, body, mediaUrl, mediaType, pollOptions, pollExpiresAt } = req.body;
-
-    if (!title || !body) {
-        return res.status(400).json({ error: "Title and body are required" });
-    }
-
-    // Validate poll data if provided
-    if (pollOptions) {
-        if (!Array.isArray(pollOptions) || pollOptions.length < 2) {
-            return res.status(400).json({ error: "Poll must have at least 2 options" });
+        // Validate required fields in all kind of posts there are there
+        if (!title || !body) {
+            return res.status(400).json({
+                error: "Title and body are required"
+            });
         }
-        if (pollOptions.length > 10) {
-            return res.status(400).json({ error: "Poll cannot have more than 10 options" });
+        // Validate poll data if provided
+        if (pollOptions) {
+            if (!Array.isArray(pollOptions) || pollOptions.length < 2) {
+                return res.status(400).json({
+                    error: "Poll must have at least 2 options"
+                });
+            }
+
+            if (pollOptions.length > 10) {
+                return res.status(400).json({
+                    error: "Poll cannot have more than 10 options"
+                });
+            }
+
+            if (pollOptions.some(option => !option.trim())) {
+                return res.status(400).json({
+                    error: "Poll options cannot be empty"
+                });
+            }
         }
-        if (pollOptions.some(option => !option.trim())) {
-            return res.status(400).json({ error: "Poll options cannot be empty" });
+
+        // Validate media type if provided
+        if (mediaUrl && mediaType) {
+            if (!["image", "video"].includes(mediaType)) {
+                return res.status(400).json({
+                    error: "Invalid media type. Must be 'image' or 'video'"
+                });
+            }
         }
-    }
 
-    // Validate media if provided
-    if (mediaUrl && mediaType) {
-        if (!["image", "video"].includes(mediaType)) {
-            return res.status(400).json({ error: "Invalid media type. Must be 'image' or 'video'" });
-        }
-    }
+        // Never store/send password
+        req.dbUser.password = undefined;
 
-    req.dbUser.password = undefined; // should not send the password
-
-    const postData = {
-        title: title,
-        body: body,
-        author: req.dbUser
-    };
-
-    // Add media if provided
-    if (mediaUrl && mediaType) {
-        postData.mediaUrl = mediaUrl;
-        postData.mediaType = mediaType;
-    }
-
-    // Add poll if provided
-    if (pollOptions) {
-        postData.poll = {
-            options: pollOptions.map(option => ({
-                text: option.trim(),
-                votes: []
-            })),
-            expiresAt: pollExpiresAt ? new Date(pollExpiresAt) : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Default 7 days
-            totalVotes: 0
+        const postData = {
+            title,
+            body,
+            author: req.dbUser
         };
-    }
 
-    const post = new PostModel(postData);
+        // Add media
+        if (mediaUrl && mediaType) {
+            postData.mediaUrl = mediaUrl;
+            postData.mediaType = mediaType;
+        }
 
-    post.save()
-        .then((dbPost) => {
-            res.status(201).json({ post: dbPost });
-        })
-        .catch((error) => {
-            console.log(error);
-            res.status(500).json({ error: "Failed to create post" });
+        // Add poll
+        if (pollOptions) {
+            postData.poll = {
+                options: pollOptions.map(option => ({
+                    text: option.trim(),
+                    votes: []
+                })),
+                expiresAt: pollExpiresAt
+                    ? new Date(pollExpiresAt)
+                    : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+                totalVotes: 0
+            };
+        }
+        const post = new PostModel(postData);
+        const dbPost = await post.save();
+        return res.status(201).json({ post: dbPost});
+
+    } catch (error) {
+        console.error("Error creating post:", error);
+        return res.status(500).json({
+            error: "Failed to create post"
         });
+    }
 });
 
-router.put('/vote', protectedResource, (req, res) => {
-    const { postId, optionIndex } = req.body;
+router.put('/vote', protectedResource, async (req, res) => {
+    try {
+        const { postId, optionIndex } = req.body;
+        
+        if (!postId || optionIndex === undefined) {
+            return res.status(400).json({error: "Post ID and option index are required"});
+        }
 
-    if (!postId || optionIndex === undefined) {
-        return res.status(400).json({ error: "Post ID and option index are required" });
+        const post = await PostModel.findById(postId)
+            .populate("author", "_id fullName profilePicUrl");
+
+        if (!post) {
+            return res.status(404).json({error: "Post not found" });
+        }
+
+        if (!post.poll) {
+            return res.status(400).json({error: "This post does not have a poll" });
+        }
+
+        // Check if poll has expired
+        if (post.poll.expiresAt && new Date() > post.poll.expiresAt) {
+            return res.status(400).json({error: "Poll has expired"});
+        }
+
+        // Validate option index
+        if (optionIndex < 0 || optionIndex >= post.poll.options.length) {
+            return res.status(400).json({ error: "Invalid option index" });
+        }
+
+        const userId = req.dbUser._id.toString();
+
+        // Check if user has already voted
+        const hasVoted = post.poll.options.some(option =>
+            option.votes.some(vote => vote.toString() === userId)
+        );
+
+        if (hasVoted) {
+            return res.status(400).json({error: "You have already voted on this poll"});
+        }
+
+        // Record vote
+        post.poll.options[optionIndex].votes.push(req.dbUser._id);
+        post.poll.totalVotes++;
+        const updatedPost = await post.save();
+        return res.json({message: "Vote recorded successfully",post: updatedPost});
+
+    } catch (error) {
+        console.error("Error voting:", error);
+        return res.status(500).json({error: "Internal server error"});
     }
-
-    PostModel.findById(postId)
-        .populate("author", "_id fullName profilePicUrl")
-        .then((post) => {
-            if (!post) {
-                return res.status(404).json({ error: "Post not found" });
-            }
-
-            if (!post.poll) {
-                return res.status(400).json({ error: "This post does not have a poll" });
-            }
-
-            // Check if poll has expired
-            if (post.poll.expiresAt && new Date() > post.poll.expiresAt) {
-                return res.status(400).json({ error: "Poll has expired" });
-            }
-
-            // Validate option index
-            if (optionIndex < 0 || optionIndex >= post.poll.options.length) {
-                return res.status(400).json({ error: "Invalid option index" });
-            }
-
-            const userId = req.dbUser._id.toString();
-
-            // Check if user has already voted
-            const hasVoted = post.poll.options.some(option => 
-                option.votes.some(vote => vote.toString() === userId)
-            );
-
-            if (hasVoted) {
-                return res.status(400).json({ error: "You have already voted on this poll" });
-            }
-
-            // Add vote
-            post.poll.options[optionIndex].votes.push(req.dbUser._id);
-            post.poll.totalVotes += 1;
-
-            post.save()
-                .then((updatedPost) => {
-                    res.json({ 
-                        message: "Vote recorded successfully", 
-                        post: updatedPost 
-                    });
-                })
-                .catch((error) => {
-                    console.error("Error saving vote:", error);
-                    res.status(500).json({ error: "Failed to record vote" });
-                });
-        })
-        .catch((error) => {
-            console.error("Error finding post:", error);
-            res.status(500).json({ error: "Internal server error" });
-        });
 });
 
 // Change vote on poll
@@ -321,8 +326,8 @@ router.put('/like', protectedResource, (req, res) => {
 router.put('/unlike', protectedResource, (req, res) => {
     PostModel.findByIdAndUpdate(
         req.body.postId,
-        { $pull: { likes: req.dbUser._id } }, // ✅ Remove user ID from likes array
-        { new: true } // ✅ Return updated document
+        { $pull: { likes: req.dbUser._id } }, //Remove user ID from likes array
+        { new: true } //  Return updated document
     )
     .populate("author", "_id fullName")
     .then((result) => { 
@@ -433,6 +438,5 @@ router.delete("/deletecomment/:postId/:commentId", protectedResource, (req, res)
             res.status(500).json({ error: "Internal server error" });
         });
 });
-
 
 module.exports=router;
