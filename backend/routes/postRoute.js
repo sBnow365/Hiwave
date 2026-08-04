@@ -316,40 +316,43 @@ router.get('/poll/:postId', protectedResource, async (req, res) => {
 });
 
 
-
-
 //implementing like endpoint
-router.put('/like', protectedResource, (req, res) => {
-    PostModel.findByIdAndUpdate(
-        req.body.postId,
-        { $push: { likes: req.dbUser._id } }, // Push user ID to likes array
-        { new: true } // Return updated document
-    )
-    .populate("author", "_id fullName")
-    .then((result) => {  //  Fix: 'result' is the first argument
-        res.json(result);
-    })
-    .catch((error) => {  // Fix: Handle errors properly
+router.put('/like', protectedResource, async (req, res) => {
+    try {
+        const updatedPost = await PostModel.findByIdAndUpdate(
+            req.body.postId,
+            { $addToSet: { likes: req.dbUser._id } },
+            { new: true }
+        ).populate("author", "_id fullName");
+
+        return res.json(updatedPost);
+
+    } catch (error) {
         console.error("Error in like API:", error);
-        res.status(400).json({ error: error.message });
-    });
+
+        return res.status(400).json({
+            error: error.message
+        });
+    }
 });
 
+router.put('/unlike', protectedResource, async (req, res) => {
+    try {
+        const updatedPost = await PostModel.findByIdAndUpdate(
+            req.body.postId,
+            { $pull: { likes: req.dbUser._id } },
+            { new: true }
+        ).populate("author", "_id fullName");
 
-router.put('/unlike', protectedResource, (req, res) => {
-    PostModel.findByIdAndUpdate(
-        req.body.postId,
-        { $pull: { likes: req.dbUser._id } }, //Remove user ID from likes array
-        { new: true } //  Return updated document
-    )
-    .populate("author", "_id fullName")
-    .then((result) => { 
-        res.json(result);
-    })
-    .catch((error) => {
+        return res.json(updatedPost);
+
+    } catch (error) {
         console.error("Error in unlike API:", error);
-        res.status(400).json({ error: error.message });
-    });
+
+        return res.status(400).json({
+            error: error.message
+        });
+    }
 });
 
 router.put("/comment", protectedResource, (req, res) => {
