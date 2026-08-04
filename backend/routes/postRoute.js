@@ -132,7 +132,7 @@ router.post('/createpost', protectedResource, async (req, res) => {
 router.put('/vote', protectedResource, async (req, res) => {
     try {
         const { postId, optionIndex } = req.body;
-        
+
         if (!postId || optionIndex === undefined) {
             return res.status(400).json({error: "Post ID and option index are required"});
         }
@@ -161,10 +161,10 @@ router.put('/vote', protectedResource, async (req, res) => {
         const userId = req.dbUser._id.toString();
 
         // Check if user has already voted
-        const hasVoted = post.poll.options.some(option =>
+        const hasVoted = post.poll.options.some(option =>// baically poll is an array of options
             option.votes.some(vote => vote.toString() === userId)
-        );
-
+        );//each option is also having an array of users hence doing to string and comparing
+            // basically a concise way of not writing for loops to check if already voted or not
         if (hasVoted) {
             return res.status(400).json({error: "You have already voted on this poll"});
         }
@@ -182,69 +182,71 @@ router.put('/vote', protectedResource, async (req, res) => {
 });
 
 // Change vote on poll
-router.put('/changevote', protectedResource, (req, res) => {
-    const { postId, newOptionIndex } = req.body;
+router.put('/changevote', protectedResource, async (req, res) => {
+    try {
+        const { postId, newOptionIndex } = req.body;
 
-    if (!postId || newOptionIndex === undefined) {
-        return res.status(400).json({ error: "Post ID and new option index are required" });
-    }
+        if (!postId || newOptionIndex === undefined) {
+            return res.status(400).json({error: "Post ID and new option index are required"});
+        }
 
-    PostModel.findById(postId)
-        .populate("author", "_id fullName profilePicUrl")
-        .then((post) => {
-            if (!post) {
-                return res.status(404).json({ error: "Post not found" });
-            }
+        const post = await PostModel.findById(postId)
+            .populate("author", "_id fullName profilePicUrl");
 
-            if (!post.poll) {
-                return res.status(400).json({ error: "This post does not have a poll" });
-            }
+        if (!post) {
+            return res.status(404).json({error: "Post not found"});
+        }
 
-            // Check if poll has expired
-            if (post.poll.expiresAt && new Date() > post.poll.expiresAt) {
-                return res.status(400).json({ error: "Poll has expired" });
-            }
+        if (!post.poll) {
+            return res.status(400).json({error: "This post does not have a poll"});
+        }
 
-            // Validate option index
-            if (newOptionIndex < 0 || newOptionIndex >= post.poll.options.length) {
-                return res.status(400).json({ error: "Invalid option index" });
-            }
-
-            const userId = req.dbUser._id.toString();
-
-            // Find and remove existing vote
-            let oldVoteFound = false;
-            post.poll.options.forEach(option => {
-                const voteIndex = option.votes.findIndex(vote => vote.toString() === userId);
-                if (voteIndex !== -1) {
-                    option.votes.splice(voteIndex, 1);
-                    oldVoteFound = true;
-                }
+        // Check if poll has expired
+        if (post.poll.expiresAt && new Date() > post.poll.expiresAt) {
+            return res.status(400).json({
+                error: "Poll has expired"
             });
+        }
 
-            if (!oldVoteFound) {
-                return res.status(400).json({ error: "You haven't voted on this poll yet" });
+        // Validate option index
+        if (newOptionIndex < 0 || newOptionIndex >= post.poll.options.length) {
+            return res.status(400).json({error: "Invalid option index"});
+        }
+
+        const userId = req.dbUser._id.toString();
+
+        // Remove the old vote
+        let oldVoteFound = false;
+
+        post.poll.options.forEach(option => {
+            const voteIndex = option.votes.findIndex(
+                vote => vote.toString() === userId
+            );
+
+            if (voteIndex !== -1) {
+                option.votes.splice(voteIndex, 1);
+                oldVoteFound = true;
             }
-
-            // Add new vote
-            post.poll.options[newOptionIndex].votes.push(req.dbUser._id);
-
-            post.save()
-                .then((updatedPost) => {
-                    res.json({ 
-                        message: "Vote changed successfully", 
-                        post: updatedPost 
-                    });
-                })
-                .catch((error) => {
-                    console.error("Error changing vote:", error);
-                    res.status(500).json({ error: "Failed to change vote" });
-                });
-        })
-        .catch((error) => {
-            console.error("Error finding post:", error);
-            res.status(500).json({ error: "Internal server error" });
         });
+
+        if (!oldVoteFound) {
+            return res.status(400).json({error: "You haven't voted on this poll yet"});
+        }
+        // Add the new vote
+        post.poll.options[newOptionIndex].votes.push(req.dbUser._id);
+
+        const updatedPost = await post.save();
+        return res.json({
+            message: "Vote changed successfully",
+            post: updatedPost
+        });
+
+    } catch (error) {
+        console.error("Error changing vote:", error);
+        return res.status(500).json({
+            error: "Internal server error"
+        });
+    }
 });
 
 // Get poll results
