@@ -15,8 +15,9 @@ module.exports = async (req, res, next) => {
 
     try {
         // Verify JWT token
-        const payload = jwt.verify(token, JWT_SECRET);
-        const { _id } = payload;
+        const payload = jwt.verify(token, JWT_SECRET);//this is baiscally the checking the token and 
+        const { _id } = payload;                        // returning an object with ur id which was ther og
+                                                        // and issued at . easily destrucutred later
 
         // Find user by ID
         const dbUser = await UserModel.findById(_id);

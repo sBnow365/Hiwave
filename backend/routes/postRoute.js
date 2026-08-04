@@ -5,44 +5,48 @@ const mongoose=require('mongoose');
 const protectedResource = require('../middleware/protectedResource');
 const PostModel=mongoose.model("PostModel");
 
-router.get('/posts',protectedResource,(req,res)=>{
-    PostModel.find()
-    .populate("author","_id fullName profilePicUrl")
-    .populate("comments.commentedBy","_id fullName profilePicUrl")    
-    .then((dbPosts)=>{
-        res.status(200).json({posts:dbPosts})
-    })
-    .catch((error)=>{
-        console.log('yo');
+router.get('/posts', protectedResource, async (req, res) => {
+    try {
+        const dbPosts = await PostModel.find()
+            .populate("author", "_id fullName profilePicUrl")
+            .populate("comments.commentedBy", "_id fullName profilePicUrl");
+
+        res.status(200).json({ posts: dbPosts });
+    } catch (error) {
         console.log(error);
-    });
+        res.status(500).json({ error: "Something went wrong" });
+    }
 });
 
-router.get('/postsfromfollowing',protectedResource,(req,res)=>{
-    PostModel.find({author:{$in:req.dbUser.following}})//return posts of not everyone kind of for loop
-    .populate("author","_id fullName profilePicUrl")
-    .populate("comments.commentedBy","_id fullName profilePicUrl")    
-    .then((dbPosts)=>{
-        res.status(200).json({posts:dbPosts})
-    })
-    .catch((error)=>{
-        console.log('yo');
+router.get('/postsfromfollowing', protectedResource, async (req, res) => {
+    try {
+        const dbPosts = await PostModel.find({
+            author: { $in: req.dbUser.following }
+        })
+        .populate("author", "_id fullName profilePicUrl")
+        .populate("comments.commentedBy", "_id fullName profilePicUrl");
+
+        res.status(200).json({ posts: dbPosts });
+    } catch (error) {
         console.log(error);
-    });
+        res.status(500).json({ error: "Something went wrong" });
+    }
 });
 
 //whatever we pass to protected route as db user will be forwarded to this endpoint
-router.get('/myposts',protectedResource,(req,res)=>{
-    PostModel.find({author : req.dbUser._id })
-    .populate("author","_id fullName profilePicUrl")
-    .populate("comments.commentedBy","_id fullName profilePicUrl")    
-    .then((dbPosts)=>{
-        res.status(200).json({posts:dbPosts})
-    })
-    .catch((error)=>{
-        console.log('yo');
+router.get('/myposts', protectedResource, async (req, res) => {
+    try {
+        const dbPosts = await PostModel.find({
+            author: req.dbUser._id
+        })
+        .populate("author", "_id fullName profilePicUrl")
+        .populate("comments.commentedBy", "_id fullName profilePicUrl");
+
+        res.status(200).json({ posts: dbPosts });
+    } catch (error) {
         console.log(error);
-    });
+        res.status(500).json({ error: "Something went wrong" });
+    }
 });
 
 
