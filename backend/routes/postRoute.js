@@ -218,10 +218,10 @@ router.put('/changevote', protectedResource, async (req, res) => {
         // Remove the old vote
         let oldVoteFound = false;
 
-        post.poll.options.forEach(option => {
+        post.poll.options.forEach(option => {// for each technically a propertry of arrays but classified as a method
             const voteIndex = option.votes.findIndex(
                 vote => vote.toString() === userId
-            );
+            );// find the index where vote to string === userId
 
             if (voteIndex !== -1) {
                 option.votes.splice(voteIndex, 1);
@@ -250,58 +250,69 @@ router.put('/changevote', protectedResource, async (req, res) => {
 });
 
 // Get poll results
-router.get('/poll/:postId', protectedResource, (req, res) => {
-    const { postId } = req.params;
+router.get('/poll/:postId', protectedResource, async (req, res) => {
+    try {
+        const { postId } = req.params;
 
-    PostModel.findById(postId)
-        .populate("author", "_id fullName profilePicUrl")
-        .populate("poll.options.votes", "_id fullName profilePicUrl")
-        .then((post) => {
-            if (!post) {
-                return res.status(404).json({ error: "Post not found" });
-            }
+        const post = await PostModel.findById(postId)
+            .populate("author", "_id fullName profilePicUrl")
+            .populate("poll.options.votes", "_id fullName profilePicUrl");
 
-            if (!post.poll) {
-                return res.status(400).json({ error: "This post does not have a poll" });
-            }
+        if (!post) {
+            return res.status(404).json({
+                error: "Post not found"
+            });
+        }
 
-            // Calculate poll statistics
-            const pollResults = {
-                ...post.poll.toObject(),
-                isExpired: post.poll.expiresAt && new Date() > post.poll.expiresAt,
-                userVote: null
-            };
+        if (!post.poll) {
+            return res.status(400).json({
+                error: "This post does not have a poll"
+            });
+        }
 
-            // Find user's vote if any
-            const userId = req.dbUser._id.toString();
-            pollResults.options.forEach((option, index) => {
-                if (option.votes.some(vote => vote._id.toString() === userId)) {
+        // Calculate poll statistics
+        const pollResults = {
+            ...post.poll.toObject(),
+            isExpired: post.poll.expiresAt && new Date() > post.poll.expiresAt,
+            userVote: null
+        };
+
+        // Find the user's vote
+        const userId = req.dbUser._id.toString();
+
+        pollResults.options.forEach((option, index) => {
+            option.votes.forEach(vote => {
+                if (vote._id.toString() === userId) {
                     pollResults.userVote = index;
                 }
             });
-
-            // Calculate percentages
-            pollResults.options = pollResults.options.map(option => ({
-                ...option,
-                voteCount: option.votes.length,
-                percentage: post.poll.totalVotes > 0 ? 
-                    Math.round((option.votes.length / post.poll.totalVotes) * 100) : 0
-            }));
-
-            res.json({ 
-                poll: pollResults,
-                post: {
-                    _id: post._id,
-                    title: post.title,
-                    body: post.body,
-                    author: post.author
-                }
-            });
-        })
-        .catch((error) => {
-            console.error("Error fetching poll:", error);
-            res.status(500).json({ error: "Internal server error" });
         });
+
+        // Calculate vote count and percentages
+        pollResults.options = pollResults.options.map(option => ({
+            ...option,
+            voteCount: option.votes.length,
+            percentage: post.poll.totalVotes > 0
+                ? Math.round((option.votes.length / post.poll.totalVotes) * 100)
+                : 0
+        }));
+
+        return res.json({
+            poll: pollResults,
+            post: {
+                _id: post._id,
+                title: post.title,
+                body: post.body,
+                author: post.author
+            }
+        });
+
+    } catch (error) {
+        console.error("Error fetching poll:", error);
+        return res.status(500).json({
+            error: "Internal server error"
+        });
+    }
 });
 
 
