@@ -380,39 +380,45 @@ router.put("/comment", protectedResource, async (req, res) => {
     }
 });
 
-router.delete("/deletepost/:postId", protectedResource, (req, res) => {
-    console.log("Received delete request for Post ID:", req.params.postId);
-    console.log("Authenticated User:", req.dbUser);
+router.delete("/deletepost/:postId", protectedResource, async (req, res) => {
+    try {
+        console.log("Received delete request for Post ID:", req.params.postId);
+        console.log("Authenticated User:", req.dbUser);
 
-    PostModel.findOne({ _id: req.params.postId })
-        .populate("author", "_id")
-        .then(post => {
-            if (!post) {
-                console.log("Post not found in database.");
-                return res.status(404).json({ error: "Post not found" });
-            }
+        const post = await PostModel.findById(req.params.postId)
+            .populate("author", "_id");
 
-            console.log("Post Author ID:", post.author._id.toString());
-            console.log("Request User ID:", req.dbUser._id.toString());
+        if (!post) {
+            console.log("Post not found in database.");
+            return res.status(404).json({
+                error: "Post not found"
+            });
+        }
 
-            if (post.author._id.toString() !== req.dbUser._id.toString()) {
-                console.log("Unauthorized deletion attempt.");
-                return res.status(403).json({ error: "Unauthorized action" });
-            }
+        console.log("Post Author ID:", post.author._id.toString());
+        console.log("Request User ID:", req.dbUser._id.toString());
 
-            PostModel.deleteOne({ _id: req.params.postId })
-                .then(() => {
-                    res.json({ message: "Post deleted successfully" });
-                })
-                .catch(error => {
-                    console.error("Error deleting post:", error);
-                    res.status(500).json({ error: "Internal server error" });
-                });
-        })
-        .catch(error => {
-            console.error("Error finding post:", error);
-            res.status(500).json({ error: "Internal server error" });
+        if (post.author._id.toString() !== req.dbUser._id.toString()) {
+            console.log("Unauthorized deletion attempt.");
+
+            return res.status(403).json({
+                error: "Unauthorized action"
+            });
+        }
+
+        await PostModel.deleteOne({ _id: req.params.postId });
+
+        return res.json({
+            message: "Post deleted successfully"
         });
+
+    } catch (error) {
+        console.error("Error deleting post:", error);
+
+        return res.status(500).json({
+            error: "Internal server error"
+        });
+    }
 });
 
 router.delete("/deletecomment/:postId/:commentId", protectedResource, async (req, res) => {
