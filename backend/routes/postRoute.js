@@ -355,29 +355,29 @@ router.put('/unlike', protectedResource, async (req, res) => {
     }
 });
 
-router.put("/comment", protectedResource, (req, res) => {
-    console.log("Received Comment Request:", req.body); // Debugging log
+router.put("/comment", protectedResource, async (req, res) => {
+    try {
+        console.log("Received Comment Request:", req.body);
+        const comment = {
+            commentText: req.body.commentText,
+            commentedBy: req.dbUser._id
+        };
+        const updatedPost = await PostModel.findByIdAndUpdate(
+            req.body.postId,
+            { $push: { comments: comment } },
+            { new: true }
+        )
+        .populate("comments.commentedBy", "_id fullName")
+        .populate("author", "_id fullName");
 
-    const comment = {
-        commentText: req.body.commentText,
-        commentedBy: req.dbUser._id
-    };
-
-    PostModel.findByIdAndUpdate(
-        req.body.postId,
-        { $push: { comments: comment } },
-        { new: true }
-    )
-    .populate("comments.commentedBy", "_id fullName")
-    .populate("author", "_id fullName")
-    .then((result) => {
-        console.log("Updated Post with Comment:", result); // Debugging log
-        res.json(result);
-    })
-    .catch((error) => {
+        console.log("Updated Post with Comment:", updatedPost);
+        return res.json(updatedPost);
+    } catch (error) {
         console.error("Error in Comment API:", error);
-        res.status(400).json({ error: error.message });
-    });
+        return res.status(400).json({
+            error: error.message
+        });
+    }
 });
 
 router.delete("/deletepost/:postId", protectedResource, (req, res) => {
@@ -415,44 +415,50 @@ router.delete("/deletepost/:postId", protectedResource, (req, res) => {
         });
 });
 
-router.delete("/deletecomment/:postId/:commentId", protectedResource, (req, res) => {
-    const { postId, commentId } = req.params;
+router.delete("/deletecomment/:postId/:commentId", protectedResource, async (req, res) => {
+    try {
+        const { postId, commentId } = req.params;
+        const post = await PostModel.findById(postId)
+            .populate("comments.commentedBy", "_id");
 
-    PostModel.findById(postId)
-        .populate("comments.commentedBy", "_id") // Ensure author data is available
-        .then(post => {
-            if (!post) {
-                return res.status(404).json({ error: "Post not found" });
-            }
+        if (!post) {
+            return res.status(404).json({
+                error: "Post not found"
+            });
+        }
+        // Find the comment
+        const comment = post.comments.find(
+            c => c._id.toString() === commentId
+        );
 
-            // Find comment to delete
-            const comment = post.comments.find(c => c._id.toString() === commentId);
-            if (!comment) {
-                return res.status(404).json({ error: "Comment not found" });
-            }
+        if (!comment) {
+            return res.status(404).json({
+                error: "Comment not found"
+            });
+        }
+        // Check ownership
+        if (comment.commentedBy._id.toString() !== req.dbUser._id.toString()) {
+            return res.status(403).json({
+                error: "Unauthorized action"
+            });
+        }
+        // Remove comment
+        post.comments = post.comments.filter(
+            c => c._id.toString() !== commentId
+        );
+        // Save changes
+        const updatedPost = await post.save();
 
-            // Check if the logged-in user is the author of the comment
-            if (comment.commentedBy._id.toString() !== req.dbUser._id.toString()) {
-                return res.status(403).json({ error: "Unauthorized action" });
-            }
-
-            // Remove comment from the post's comments array
-            post.comments = post.comments.filter(c => c._id.toString() !== commentId);
-
-            // Save updated post
-            post.save()
-                .then(updatedPost => {
-                    res.json({ message: "Comment deleted successfully", updatedPost });
-                })
-                .catch(error => {
-                    console.error("Error saving post after deleting comment:", error);
-                    res.status(500).json({ error: "Internal server error" });
-                });
-        })
-        .catch(error => {
-            console.error("Error finding post:", error);
-            res.status(500).json({ error: "Internal server error" });
+        return res.json({
+            message: "Comment deleted successfully",
+            updatedPost
         });
+    } catch (error) {
+        console.error("Error deleting comment:", error);
+        return res.status(500).json({
+            error: "Internal server error"
+        });
+    }
 });
 
 module.exports=router;
